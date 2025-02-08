@@ -1,0 +1,13 @@
+<div class="dashboard-page-container">
+  <iframe 
+    [src]="grafanaSafeUrl"
+    class="grafana-iframe"
+    [style.width.px]="baseWidth"
+    [style.height.px]="baseHeight"
+    [style.transform]="'translate(-50%, -50%) scale(' + scaleFactor + ')'"
+    style="transform-origin: top left;"
+    frameborder="0"
+    scrolling="no"
+    allowfullscreen>
+  </iframe>
+</div>

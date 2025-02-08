@@ -1,1 +1,65 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global reset and base styles without forcing flex centering on the entire page */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  /* Removed: display: flex; justify-content: center; align-items: center; */
+}
+
+/* Login page styles - apply centering only on the login container */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+  padding: 30px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  /* Optional: Center the login container in the viewport */
+  margin: 0 auto;
+}
+
+/* Logo styling for the login page */
+.logo {
+  width: 80%;
+  max-width: 150px;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+/* Login button styling */
+.login-button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #0078D4;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.login-button:hover {
+  background-color: #005A9E;
+}
+
+/* Remove or neutralize global header styles so they don't conflict with your MainLayoutComponent */
+.header {
+  /* The following properties were causing issues on pages that use a different layout.
+     Remove them so that component-specific styles can take effect. */
+  position: static;
+  width: auto;
+  padding: 0;
+  text-align: initial;
+  background: none;
+  border-bottom: none;
+}

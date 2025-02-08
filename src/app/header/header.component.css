@@ -1,0 +1,34 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  background-color: #051464; /* SLB Deep Blue */
+  color: white;
+  padding: 0 20px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.title {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.theme-selector {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9em;
+}
+
+.theme-selector label {
+  color: white;
+}
+
+.theme-selector select {
+  padding: 5px;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+}

@@ -1,0 +1,48 @@
+/* Sidebar: fixed width with padding and background */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 220px; /* Fixed width */
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #DCE1E1; /* SLB Light Grey 2 */
+}
+
+/* Navigation menu: ensure full width */
+.menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Each list item gets a little margin at the bottom */
+.menu ul li {
+  margin-bottom: 10px;
+}
+
+/* Make the anchor display as block so that it takes the full width */
+.menu ul li a {
+  display: block;
+  text-decoration: none;
+  color: #051464;
+  font-weight: bold;
+  font-size: 1em;
+  /* Optionally, add some padding for a nicer clickable area */
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+/* Logo container: pushes logo to the bottom */
+.logo-container {
+  margin-top: auto; /* Pushes the logo to the bottom of the sidebar */
+  text-align: center;
+  padding-top: 20px;
+}
+
+.logo {
+  width: 100px;
+  height: auto;
+}
