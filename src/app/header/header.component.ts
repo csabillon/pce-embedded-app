@@ -15,8 +15,7 @@ export class HeaderComponent {
   
   onThemeChange(event: Event): void {
     const selectEl = event.target as HTMLSelectElement;
-    const newTheme = selectEl.value;
-    this.themeService.setTheme(newTheme);
-    this.selectedTheme = newTheme;
+    this.selectedTheme = selectEl.value;
+    this.themeService.setTheme(selectEl.value);
   }
 }

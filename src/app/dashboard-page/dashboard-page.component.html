@@ -4,8 +4,7 @@
     class="grafana-iframe"
     [style.width.px]="baseWidth"
     [style.height.px]="baseHeight"
-    [style.transform]="'translate(-50%, -50%) scale(' + scaleFactor + ')'"
-    style="transform-origin: top left;"
+    [style.transform]="'translate(calc(-50% + ' + xOffset + 'px), calc(-50% + ' + yOffset + 'px)) scale(' + scaleFactor + ')'"
     frameborder="0"
     scrolling="no"
     allowfullscreen>

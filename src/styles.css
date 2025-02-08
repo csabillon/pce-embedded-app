@@ -1,14 +1,14 @@
-/* Global reset and base styles without forcing flex centering on the entire page */
+/* Global reset and base styles */
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  /* Removed: display: flex; justify-content: center; align-items: center; */
+  /* Set background to transparent so that your MainLayout can control the background (light/dark) */
+  background: transparent;
 }
 
-/* Login page styles - apply centering only on the login container */
+/* Login page styles - these apply only to the login page */
 .login-container {
   display: flex;
   flex-direction: column;
@@ -22,7 +22,7 @@ html, body {
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   position: relative;
-  /* Optional: Center the login container in the viewport */
+  /* Center horizontally */
   margin: 0 auto;
 }
 
@@ -52,10 +52,8 @@ html, body {
   background-color: #005A9E;
 }
 
-/* Remove or neutralize global header styles so they don't conflict with your MainLayoutComponent */
+/* Remove any conflicting global header styles so they don't affect your MainLayout's header */
 .header {
-  /* The following properties were causing issues on pages that use a different layout.
-     Remove them so that component-specific styles can take effect. */
   position: static;
   width: auto;
   padding: 0;

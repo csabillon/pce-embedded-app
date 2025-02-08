@@ -1,4 +1,4 @@
-/* Override global html/body centering for this component */
+/* Ensure the host element fills the viewport */
 :host {
   display: block;
   height: 100vh;
@@ -7,10 +7,7 @@
   padding: 0;
 }
 
-/* 
-  Force our layout container to fill the host element.
-  This helps ensure our internal flex layout is not affected by global centering.
-*/
+/* The main container for the layout */
 .layout-container {
   display: flex;
   flex-direction: column;
@@ -18,17 +15,19 @@
   width: 100%;
 }
 
-/* Override any global header styles (global styles set .header to absolute and centered) */
-.layout-container > .header {
-  position: relative !important;
-  top: auto !important;
+/* Light theme background */
+.layout-container.light {
+  background-color: #f4f4f4;  /* A light grey that isn't pure white */
 }
 
-/* Header: full width at the top with a fixed height */
+/* Dark theme background */
+.layout-container.dark {
+  background-color: #1f1f1f;  /* A dark background */
+}
+
+/* Header: full width, fixed height */
 .header {
   flex: 0 0 60px;
-  background-color: #051464; /* SLB Deep Blue */
-  color: white;
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -36,7 +35,7 @@
   width: 100%;
 }
 
-/* Body wrapper: takes up the remaining vertical space */
+/* Body-wrapper: holds sidebar and content */
 .body-wrapper {
   flex: 1;
   display: flex;
@@ -44,10 +43,9 @@
   overflow: hidden;
 }
 
-/* Sidebar: fixed width on the left, full height of the body-wrapper */
+/* Sidebar: fixed width on the left */
 .sidebar {
   flex: 0 0 220px;
-  background-color: #DCE1E1; /* SLB Light Grey 2 */
   padding: 20px;
   box-sizing: border-box;
   display: flex;
@@ -55,54 +53,18 @@
   overflow-y: auto;
 }
 
-/* Navigation styles inside the sidebar */
-.sidebar nav ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.sidebar nav ul li {
-  margin-bottom: 10px;
-}
-
-.sidebar nav ul li a {
-  display: block; /* ensure link fills available width */
-  text-decoration: none;
-  color: #051464;
-  font-weight: bold;
-  padding: 5px;
-  box-sizing: border-box;
-}
-
-/* Logo container: push logo to the bottom of the sidebar */
-.logo-container {
-  margin-top: auto;
-  text-align: center;
-  padding-top: 20px;
-}
-
-.logo-container img {
-  width: 100px;
-  height: auto;
-}
-
-/* Content area: fills the remaining space next to the sidebar */
+/* Content area: fills the remaining space and has a transparent background */
 .content {
   flex: 1;
   padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
-  background-color: #fff;
+  background-color: transparent;  /* Let the parent's (layout-container) background show */
 }
 
-/* Footer: full width at the bottom with a fixed height */
+/* Footer: fixed height, full width */
 .footer {
   flex: 0 0 40px;
-  background-color: #f5f5f5;
-  border-top: 1px solid #ddd;
   display: flex;
   align-items: center;
   justify-content: center;

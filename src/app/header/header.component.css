@@ -1,13 +1,27 @@
+:host {
+  display: block;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   height: 60px;
-  background-color: #051464; /* SLB Deep Blue */
-  color: white;
   padding: 0 20px;
   box-sizing: border-box;
   width: 100%;
+}
+
+/* Light theme styling */
+:host-context(.light) .header {
+  background-color: #051464; /* SLB Deep Blue */
+  color: white;
+}
+
+/* Dark theme styling */
+:host-context(.dark) .header {
+  background-color: #0b132b; /* Dark navy */
+  color: #eee;
 }
 
 .title {
@@ -23,7 +37,7 @@
 }
 
 .theme-selector label {
-  color: white;
+  color: inherit;
 }
 
 .theme-selector select {
