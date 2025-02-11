@@ -8,18 +8,32 @@ export const routes: Routes = [
   // Public login route remains unchanged.
   { path: 'login', component: LoginComponent },
   
-  // Protected area: the MainLayoutComponent wraps all authenticated pages.
-  // Here, the route 'd' will load the main layout,
-  // and its default child route (an empty path) will load the DashboardPageComponent.
+  // Protected area: MainLayoutComponent wraps all authenticated pages.
   {
-    path: '',
+    path: 'app',
     component: MainLayoutComponent,
     canActivate: [MsalGuard],
     children: [
-      { path: '', component: DashboardPageComponent, pathMatch: 'full' }
+      // Default child: BOP Stack dashboard.
+      { path: '', component: DashboardPageComponent, pathMatch: 'full' },
+      // New regulators route: pass the regulators URL via route data.
+      {
+        path: 'regulators',
+        component: DashboardPageComponent,
+        data: {
+          baseGrafanaUrl: 'http://localhost:3000/d/eeazp1y1a86bkd/regulators?orgId=1&from=now-1h&to=now&timezone=browser&refresh=auto'
+        }
+      },
+      {
+        path: 'analogs',
+        component: DashboardPageComponent,
+        data: {
+          baseGrafanaUrl: 'http://localhost:3000/d/deazfskabc0e8e/analogs?orgId=1&from=now-1h&to=now&timezone=browser&refresh=auto'
+        }
+      }
     ]
   },
   
-  // Any unknown path redirects to login.
-  { path: '**', redirectTo: 'login', pathMatch: 'full' },
+  // Redirect any unknown paths to /login.
+  { path: '**', redirectTo: 'login', pathMatch: 'full' }
 ];

@@ -12,13 +12,13 @@
   width: 100%;
 }
 
-/* Light theme styling */
+/* Light theme styling (applied when parent has .light class) */
 :host-context(.light) .header {
   background-color: #051464; /* SLB Deep Blue */
   color: white;
 }
 
-/* Dark theme styling */
+/* Dark theme styling (applied when parent has .dark class) */
 :host-context(.dark) .header {
   background-color: #0b132b; /* Dark navy */
   color: #eee;
@@ -29,20 +29,47 @@
   font-weight: bold;
 }
 
-.theme-selector {
+.theme-toggle {
   display: flex;
   align-items: center;
-  gap: 5px;
+  cursor: pointer;
+}
+
+/* Toggle switch container */
+.toggle-switch {
+  width: 40px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: #ccc;
+  position: relative;
+  transition: background-color 0.3s ease;
+  margin-right: 10px;
+}
+
+/* When in dark mode, change the switch's background */
+.toggle-switch.dark {
+  background-color: #4f4f4f;
+}
+
+/* Toggle handle: a circle inside the switch */
+.toggle-handle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #fff;
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  transition: transform 0.3s ease;
+}
+
+/* When in dark mode, shift the handle to the right */
+.toggle-switch.dark .toggle-handle {
+  transform: translateX(20px);
+}
+
+/* Label next to the toggle */
+.toggle-label {
   font-size: 0.9em;
-}
-
-.theme-selector label {
-  color: inherit;
-}
-
-.theme-selector select {
-  padding: 5px;
-  border-radius: 5px;
-  border: none;
-  outline: none;
+  user-select: none;
 }

@@ -1,7 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { ThemeService } from '../theme.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -18,24 +19,28 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   // Computed scale factor
   scaleFactor: number = 1;
   
-  // Offsets for fine-tuning the iframe position:
-  // xOffset: horizontal adjustment in pixels (positive moves right)
-  // yOffset: vertical adjustment in pixels (positive moves down)
+  // Offsets for fine-tuning the iframe position
   xOffset: number = 0;
-  yOffset: number = 10;  // Adjust this value as needed to ensure top controls are visible
-
+  yOffset: number = 10;  // Adjust as needed
+  
   private themeSubscription!: Subscription;
-
-  // Base URL for your Grafana dashboard.
-  private baseGrafanaUrl: string =
+  
+  // Make baseGrafanaUrl an input with a default value
+  @Input() baseGrafanaUrl: string =
     'http://localhost:3000/d/bebkljiu19vcwf/bop-stack?orgId=1&from=now-30m&to=now&timezone=browser&refresh=5s';
-
+  
   constructor(
     private sanitizer: DomSanitizer,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    // Check route data for an override of baseGrafanaUrl
+    const routeUrl = this.activatedRoute.snapshot.data['baseGrafanaUrl'];
+    if (routeUrl) {
+      this.baseGrafanaUrl = routeUrl;
+    }
     // Subscribe to theme changes from the global ThemeService.
     this.themeSubscription = this.themeService.theme$.subscribe(theme => {
       this.updateGrafanaUrl(theme);
@@ -52,7 +57,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   }
 
   updateGrafanaUrl(theme: string): void {
-    // Append the current theme and kiosk parameters (to hide Grafana's native header)
+    // Append the current theme and kiosk parameter.
     const url = `${this.baseGrafanaUrl}&theme=${theme}&kiosk`;
     this.grafanaSafeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
     console.log('Updated Grafana URL:', url);

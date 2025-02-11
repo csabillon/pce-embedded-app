@@ -1,12 +1,24 @@
 <aside class="sidebar">
   <nav class="menu">
     <ul>
-      <li><a routerLink="/dashboard">BOP Stack</a></li>
-      <li><a routerLink="/analogs">Analogs</a></li>
-      <li><a routerLink="/regulators">Regulators</a></li>
+      <li>
+        <a routerLink="/app">
+          <fa-icon icon="oil-well"></fa-icon> BOP Stack
+        </a>
+      </li>
+      <li>
+        <a routerLink="/app/analogs">
+          <fa-icon icon="chart-line"></fa-icon> Analogs
+        </a>
+      </li>
+      <li>
+        <a routerLink="/app/regulators">
+          <fa-icon icon="gauge"></fa-icon> Regulators
+        </a>
+      </li>
     </ul>
   </nav>
   <div class="logo-container">
-    <img src="assets/logo.png" alt="Company Logo" class="logo">
+    <img [src]="logoUrl" alt="Company Logo" class="logo" />
   </div>
 </aside>

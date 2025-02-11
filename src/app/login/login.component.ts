@@ -23,7 +23,7 @@ export class LoginComponent implements OnInit {
     this.msalService.instance.handleRedirectPromise().then((res: AuthenticationResult | null) => {
       if (res?.account) {
         this.msalService.instance.setActiveAccount(res.account);
-        this.router.navigate(['/']);
+        this.router.navigate(['/app']);
       }
     });
   }

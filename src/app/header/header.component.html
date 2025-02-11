@@ -1,10 +1,9 @@
 <header class="header">
   <div class="title">PCE Connect Dashboard</div>
-  <div class="theme-selector">
-    <label for="themeSelect">Theme:</label>
-    <select id="themeSelect" (change)="onThemeChange($event)" [value]="selectedTheme">
-      <option value="light">Light</option>
-      <option value="dark">Dark</option>
-    </select>
+  <div class="theme-toggle" (click)="toggleTheme()">
+    <div class="toggle-switch" [ngClass]="{'dark': isDark}">
+      <div class="toggle-handle"></div>
+    </div>
+    <span class="toggle-label">{{ isDark ? 'Dark' : 'Light' }}</span>
   </div>
 </header>
