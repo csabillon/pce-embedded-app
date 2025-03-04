@@ -1,4 +1,19 @@
 <aside class="sidebar">
+  <!-- Rig selection displayed on top with minimal styling -->
+  <div class="rig-selection-top" (click)="toggleRigPopup()">
+    <fa-icon icon="bars" class="rig-icon"></fa-icon>
+    <span class="rig-name">
+      {{ currentRig === 'TODPS' ? 'TransoceanDPS' : 'TransoceanDVS' }}
+    </span>
+    <div class="rig-popup" *ngIf="isRigPopupOpen">
+      <ul>
+        <li (click)="selectRig('TODPS'); $event.stopPropagation()">TransoceanDPS</li>
+        <li (click)="selectRig('TODVS'); $event.stopPropagation()">TransoceanDVS</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Other sidebar navigation items -->
   <nav class="menu">
     <ul>
       <li>
@@ -16,8 +31,14 @@
           <fa-icon icon="gauge"></fa-icon> Regulators
         </a>
       </li>
+      <li>
+        <a routerLink="/app/subsea">
+          <fa-icon icon="water"></fa-icon> Subsea
+        </a>
+      </li>
     </ul>
   </nav>
+
   <div class="logo-container">
     <img [src]="logoUrl" alt="Company Logo" class="logo" />
   </div>

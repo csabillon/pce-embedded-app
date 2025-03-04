@@ -3,6 +3,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { ThemeService } from '../theme.service';
 import { ActivatedRoute } from '@angular/router';
+import { NavigationService } from '../navigation.service';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -11,63 +12,110 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./dashboard-page.component.css']
 })
 export class DashboardPageComponent implements OnInit, OnDestroy {
-
   grafanaSafeUrl: SafeResourceUrl | null = null;
-  // Assumed native resolution for the Grafana dashboard (QHD)
+  // Native dashboard resolution.
   baseWidth: number = 2560;
-  baseHeight: number = 1440;
-  // Computed scale factor
-  scaleFactor: number = 1;
-  
-  // Offsets for fine-tuning the iframe position
-  xOffset: number = 0;
-  yOffset: number = 10;  // Adjust as needed
-  
+  baseHeight: number = 1340;
+
+  availableWidth: number = 0;
+  availableHeight: number = 0;
+
+  scaleX: number = 1;
+  scaleY: number = 1;
+
+  effectiveWidth: number = 0;
+  effectiveHeight: number = 0;
+
+  @Input() scrollThreshold: number = 0.6;
+  scrollingEnabled: boolean = false;
+
   private themeSubscription!: Subscription;
-  
-  // Make baseGrafanaUrl an input with a default value
-  @Input() baseGrafanaUrl: string =
-    'http://localhost:3000/d/bebkljiu19vcwf/bop-stack?orgId=1&from=now-30m&to=now&timezone=browser&refresh=5s';
-  
+  private navigationSubscription!: Subscription;
+
+  // URL template using a placeholder {rig}
+  private baseGrafanaUrlTemplate: string =
+    'http://localhost:3000/d/{rig}_BOP/pce-bop-stack-uid?orgId=1&from=now-30m&to=now&timezone=browser&refresh=5s';
+
+  @Input() baseGrafanaUrl: string = this.baseGrafanaUrlTemplate;
+
   constructor(
     private sanitizer: DomSanitizer,
     private themeService: ThemeService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private navigationService: NavigationService
   ) {}
 
   ngOnInit(): void {
-    // Check route data for an override of baseGrafanaUrl
+    // If a route provides a Grafana URL, override the template.
     const routeUrl = this.activatedRoute.snapshot.data['baseGrafanaUrl'];
     if (routeUrl) {
+      this.baseGrafanaUrlTemplate = routeUrl;
       this.baseGrafanaUrl = routeUrl;
     }
-    // Subscribe to theme changes from the global ThemeService.
+
     this.themeSubscription = this.themeService.theme$.subscribe(theme => {
       this.updateGrafanaUrl(theme);
     });
-    this.calculateScaleFactor();
-    window.addEventListener('resize', this.calculateScaleFactor.bind(this));
+
+    this.navigationSubscription = this.navigationService.rig$.subscribe(rig => {
+      this.updateGrafanaUrlWithRig(rig);
+    });
+
+    this.calculateScaleFactors();
+    window.addEventListener('resize', this.calculateScaleFactors.bind(this));
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('resize', this.calculateScaleFactor.bind(this));
+    window.removeEventListener('resize', this.calculateScaleFactors.bind(this));
     if (this.themeSubscription) {
       this.themeSubscription.unsubscribe();
+    }
+    if (this.navigationSubscription) {
+      this.navigationSubscription.unsubscribe();
     }
   }
 
   updateGrafanaUrl(theme: string): void {
-    // Append the current theme and kiosk parameter.
     const url = `${this.baseGrafanaUrl}&theme=${theme}&kiosk`;
     this.grafanaSafeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-    console.log('Updated Grafana URL:', url);
   }
 
-  calculateScaleFactor(): void {
-    // Available height: window height minus header (60px) and footer (40px)
-    // Available width: window width minus sidebar width (220px)
-    const availableHeight = window.innerHeight - 60 - 40;
-    const availableWidth = window.innerWidth - 220;
-    this.scaleFactor = Math.min(availableWidth / this.baseWidth, availableHeight / this.baseHeight);
+  updateGrafanaUrlWithRig(rig: string): void {
+    // Replace the {rig} placeholder with the selected rig.
+    this.baseGrafanaUrl = this.baseGrafanaUrlTemplate.replace('{rig}', rig);
+    // Update the URL with the current theme.
+    this.themeService.theme$.subscribe(theme => {
+      this.updateGrafanaUrl(theme);
+    }).unsubscribe();
+  }
+
+  calculateScaleFactors(): void {
+    const marginWidth = 160;
+    const marginHeight = 60;
+    this.availableWidth = window.innerWidth - marginWidth;
+    this.availableHeight = window.innerHeight - marginHeight;
+
+    const naturalScaleX = Math.min(this.availableWidth / this.baseWidth, 1);
+    const naturalScaleY = Math.min(this.availableHeight / this.baseHeight, 1);
+
+    this.scrollingEnabled = false;
+
+    if (naturalScaleX >= this.scrollThreshold) {
+      this.scaleX = naturalScaleX;
+      this.effectiveWidth = this.baseWidth;
+    } else {
+      this.scaleX = this.scrollThreshold;
+      this.effectiveWidth = this.baseWidth;
+      this.scrollingEnabled = true;
+    }
+
+    if (naturalScaleY >= this.scrollThreshold) {
+      this.scaleY = naturalScaleY;
+      this.effectiveHeight = this.baseHeight;
+    } else {
+      this.scaleY = this.scrollThreshold;
+      this.effectiveHeight = this.baseHeight;
+      this.scrollingEnabled = true;
+    }
   }
 }

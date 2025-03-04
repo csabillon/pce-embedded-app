@@ -16,19 +16,28 @@ export const routes: Routes = [
     children: [
       // Default child: BOP Stack dashboard.
       { path: '', component: DashboardPageComponent, pathMatch: 'full' },
-      // New regulators route: pass the regulators URL via route data.
+      // Regulators route.
       {
         path: 'regulators',
         component: DashboardPageComponent,
         data: {
-          baseGrafanaUrl: 'http://localhost:3000/d/eeazp1y1a86bkd/regulators?orgId=1&from=now-1h&to=now&timezone=browser&refresh=auto'
+          baseGrafanaUrl: 'http://localhost:3000/d/{rig}_REG/regulators?orgId=1&from=now-6h&to=now&timezone=browser&refresh=auto'
         }
       },
+      // Analogs route.
       {
         path: 'analogs',
         component: DashboardPageComponent,
         data: {
-          baseGrafanaUrl: 'http://localhost:3000/d/deazfskabc0e8e/analogs?orgId=1&from=now-1h&to=now&timezone=browser&refresh=auto'
+          baseGrafanaUrl: 'http://localhost:3000/d/{rig}_ANA/analogs?orgId=1&from=now-6h&to=now&timezone=browser&refresh=auto'
+        }
+      },
+      // New Subsea route.
+      {
+        path: 'subsea',
+        component: DashboardPageComponent,
+        data: {
+          baseGrafanaUrl: 'http://localhost:3000/d/{rig}_SUB/subsea?orgId=1&from=now-6h&to=now&timezone=browser&refresh=auto'
         }
       }
     ]

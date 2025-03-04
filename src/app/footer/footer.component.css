@@ -3,14 +3,16 @@
 }
 
 .footer {
+  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 40px;
+  height: 20px;
   width: 100%;
   border-top: 1px solid #ddd;
   box-sizing: border-box;
 }
+
 
 /* Light theme defaults */
 :host-context(.light) .footer {

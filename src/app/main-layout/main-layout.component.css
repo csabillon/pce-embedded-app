@@ -27,10 +27,10 @@
 
 /* Header: full width, fixed height */
 .header {
-  flex: 0 0 60px;
+  flex: 0 0 40px;
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 10px;
   box-sizing: border-box;
   width: 100%;
 }
@@ -45,8 +45,8 @@
 
 /* Sidebar: fixed width on the left */
 .sidebar {
-  flex: 0 0 220px;
-  padding: 20px;
+  flex: 0 0 160px;
+  padding: 10px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -56,7 +56,6 @@
 /* Content area: fills the remaining space and has a transparent background */
 .content {
   flex: 1;
-  padding: 20px;
   box-sizing: border-box;
   overflow-y: auto;
   background-color: transparent;  /* Let the parent's (layout-container) background show */
@@ -64,7 +63,7 @@
 
 /* Footer: fixed height, full width */
 .footer {
-  flex: 0 0 40px;
+  flex: 0 0 20px;
   display: flex;
   align-items: center;
   justify-content: center;

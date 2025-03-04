@@ -1,10 +1,14 @@
-<div class="dashboard-page-container">
+<div class="dashboard-page-container" 
+     [class.scroll-enabled]="scrollingEnabled"
+     [style.width.px]="availableWidth" 
+     [style.height.px]="availableHeight">
   <iframe 
     [src]="grafanaSafeUrl"
     class="grafana-iframe"
-    [style.width.px]="baseWidth"
-    [style.height.px]="baseHeight"
-    [style.transform]="'translate(calc(-50% + ' + xOffset + 'px), calc(-50% + ' + yOffset + 'px)) scale(' + scaleFactor + ')'"
+    [style.width.px]="scrollingEnabled ? effectiveWidth : baseWidth"
+    [style.height.px]="scrollingEnabled ? effectiveHeight : baseHeight"
+    [style.transform]="'scaleX(' + scaleX + ') scaleY(' + scaleY + ')'"
+    [style.transformOrigin]="'top left'"
     frameborder="0"
     scrolling="no"
     allowfullscreen>

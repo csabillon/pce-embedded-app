@@ -1,56 +1,116 @@
-/* Style the list */
+/* Global host styling: all text is bold */
+:host {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  color: inherit;
+}
+
+/* Rig selection styling at the top */
+.rig-selection-top {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 6px 2px;
+  margin-bottom: 12px;
+  color: inherit;
+}
+
+.rig-icon {
+  font-size: 16px;
+  margin-right: 6px;
+  color: inherit;
+}
+
+.rig-name {
+  flex-grow: 1;
+}
+
+/* Popup for rig selection with theme-sensitive background */
+.rig-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #fff;  /* default for light theme */
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  width: 100%;
+  z-index: 100;
+}
+
+:host-context(.dark) .rig-popup {
+  background-color: #444;  /* dark background for dark theme */
+  border-color: rgba(255,255,255,0.1);
+  color: #eee;
+}
+
+.rig-popup ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rig-popup li {
+  padding: 6px 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.rig-popup li:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+:host-context(.dark) .rig-popup li:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Sidebar menu styles with indent */
 .menu ul {
   list-style: none;
   padding: 0;
   margin: 0;
-  width: 100%;
   box-sizing: border-box;
+  padding-left: 10px;  /* indent menu items */
 }
 
 .menu ul li {
-  margin-bottom: 10px;
+  margin-bottom: 16px;
 }
 
-/* Style the links */
 .menu ul li a {
-  display: flex; /* Align icon and text horizontally */
-  align-items: center; /* Vertically center icon and text */
-  text-decoration: none; /* Remove underline from links */
-  font-weight: bold;
-  padding: 5px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  padding: 4px 0;
   color: inherit;
-  transition: color 0.3s; /* Add smooth hover effect */
+  transition: color 0.3s;
 }
 
-/* Optional hover effect for links */
 .menu ul li a:hover {
-  color: #0055aa; /* Change text/icon color on hover */
+  color: #0055aa;
 }
 
-/* Space between the icon and text */
 .menu ul li a fa-icon {
-  margin-right: 8px; /* Add spacing between the icon and the text */
-  font-size: 18px; /* Adjust icon size */
+  margin-right: 8px;
+  font-size: 14px;
 }
 
-/* Sidebar styles */
+/* Sidebar container styles */
 .sidebar {
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 220px;
-  padding: 20px;
+  width: 160px;
+  padding: 10px;
   box-sizing: border-box;
-  background-color: #DCE1E1; /* SLB Light Grey 2 */
+  background-color: #DCE1E1;
 }
 
-/* Light theme defaults */
 :host-context(.light) .sidebar {
   background-color: #DCE1E1;
   color: #051464;
 }
 
-/* Dark theme overrides */
 :host-context(.dark) .sidebar {
   background-color: #2c2c2c;
   color: #eee;
