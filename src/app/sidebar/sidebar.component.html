@@ -3,12 +3,13 @@
   <div class="rig-selection-top" (click)="toggleRigPopup()">
     <fa-icon icon="bars" class="rig-icon"></fa-icon>
     <span class="rig-name">
-      {{ currentRig === 'TODPS' ? 'TransoceanDPS' : 'TransoceanDVS' }}
+      {{ currentRig === 'TODPS' ? 'TransoceanDPS' : 'TransoceanDTH' }}
     </span>
     <div class="rig-popup" *ngIf="isRigPopupOpen">
       <ul>
         <li (click)="selectRig('TODPS'); $event.stopPropagation()">TransoceanDPS</li>
-        <li (click)="selectRig('TODVS'); $event.stopPropagation()">TransoceanDVS</li>
+        <li (click)="selectRig('TODTH'); $event.stopPropagation()">TransoceanDTH</li>
+        <li (click)="selectRig('TODGD'); $event.stopPropagation()">TransoceanDGD</li>
       </ul>
     </div>
   </div>

@@ -13,7 +13,9 @@ import { NavigationService } from '../navigation.service';
 })
 export class DashboardPageComponent implements OnInit, OnDestroy {
   grafanaSafeUrl: SafeResourceUrl | null = null;
+  
   // Native dashboard resolution.
+  // baseWidth will be set dynamically based on the window.innerWidth.
   baseWidth: number = 2560;
   baseHeight: number = 1340;
 
@@ -26,8 +28,9 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   effectiveWidth: number = 0;
   effectiveHeight: number = 0;
 
-  @Input() scrollThreshold: number = 0.6;
-  scrollingEnabled: boolean = false;
+  @Input() scrollThreshold: number = 0.8;
+  scrollingEnabledX: boolean = false;
+  scrollingEnabledY: boolean = false;
 
   private themeSubscription!: Subscription;
   private navigationSubscription!: Subscription;
@@ -95,10 +98,19 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     this.availableWidth = window.innerWidth - marginWidth;
     this.availableHeight = window.innerHeight - marginHeight;
 
+    // Set baseWidth dynamically:
+    // If window.innerWidth is less than 2100, use 1920; otherwise, use 2560.
+    if (window.innerWidth < 2100) {
+      this.baseWidth = 1920;
+    } else {
+      this.baseWidth = 2560;
+    }
+
     const naturalScaleX = Math.min(this.availableWidth / this.baseWidth, 1);
     const naturalScaleY = Math.min(this.availableHeight / this.baseHeight, 1);
 
-    this.scrollingEnabled = false;
+    this.scrollingEnabledX = false;
+    this.scrollingEnabledY = false;
 
     if (naturalScaleX >= this.scrollThreshold) {
       this.scaleX = naturalScaleX;
@@ -106,7 +118,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     } else {
       this.scaleX = this.scrollThreshold;
       this.effectiveWidth = this.baseWidth;
-      this.scrollingEnabled = true;
+      this.scrollingEnabledX = true;
     }
 
     if (naturalScaleY >= this.scrollThreshold) {
@@ -115,7 +127,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     } else {
       this.scaleY = this.scrollThreshold;
       this.effectiveHeight = this.baseHeight;
-      this.scrollingEnabled = true;
+      this.scrollingEnabledY = true;
     }
   }
 }

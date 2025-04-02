@@ -1,11 +1,17 @@
 .dashboard-page-container {
   position: relative;
   /* Container is sized via inline styles to exactly match available pixels */
-  overflow: hidden; /* No scrollbars in responsive mode */
+  overflow: hidden; /* No scrollbars by default */
 }
 
-.dashboard-page-container.scroll-enabled {
-  overflow: auto;   /* Scrollbars appear in clamped mode */
+/* Enable horizontal scrolling only */
+.dashboard-page-container.scroll-enabled-x {
+  overflow-x: auto;
+}
+
+/* Enable vertical scrolling only */
+.dashboard-page-container.scroll-enabled-y {
+  overflow-y: auto;
 }
 
 .grafana-iframe {
