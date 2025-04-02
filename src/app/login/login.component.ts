@@ -1,4 +1,3 @@
-// src/app/login/login.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -19,16 +18,17 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Handle the MSAL redirect flow
+    // Handle the MSAL redirect flow.
     this.msalService.instance.handleRedirectPromise().then((res: AuthenticationResult | null) => {
       if (res?.account) {
         this.msalService.instance.setActiveAccount(res.account);
-        this.router.navigate(['/app']);
+        // Navigate to the startup page within the protected area.
+        this.router.navigate(['/app/startup']);
       }
     });
   }
 
-  login() {
+  login(): void {
     this.msalService.loginRedirect();
   }
 }

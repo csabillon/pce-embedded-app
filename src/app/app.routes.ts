@@ -3,6 +3,7 @@ import { MsalGuard } from '@azure/msal-angular';
 import { LoginComponent } from './login/login.component';
 import { MainLayoutComponent } from './main-layout/main-layout.component';
 import { DashboardPageComponent } from './dashboard-page/dashboard-page.component';
+import { StartupPageComponent } from './startup-page/startup-page.component';
 
 export const routes: Routes = [
   // Public login route remains unchanged.
@@ -14,14 +15,16 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     canActivate: [MsalGuard],
     children: [
+      // Startup page: Displayed as the home/startup view with the map.
+      { path: 'startup', component: StartupPageComponent },
       // Default child: BOP Stack dashboard.
-      { path: '', component: DashboardPageComponent, pathMatch: 'full' },
+      { path: 'bopstack', component: DashboardPageComponent, pathMatch: 'full' },
       // Regulators route.
       {
         path: 'regulators',
         component: DashboardPageComponent,
         data: {
-          baseGrafanaUrl: 'http://localhost:3000/d/{rig}_REG/regulators?orgId=1&from=now-6h&to=now&timezone=browser&refresh=auto'
+          baseGrafanaUrl: 'http://grafana/d/{rig}_REG/regulators?orgId=1&from=now-6h&to=now&timezone=browser&refresh=auto&kiosk&panelId=1'
         }
       },
       // Analogs route.
@@ -29,15 +32,15 @@ export const routes: Routes = [
         path: 'analogs',
         component: DashboardPageComponent,
         data: {
-          baseGrafanaUrl: 'http://localhost:3000/d/{rig}_ANA/analogs?orgId=1&from=now-6h&to=now&timezone=browser&refresh=auto'
+          baseGrafanaUrl: 'http://grafana/d/{rig}_ANA/analogs?orgId=1&from=now-6h&to=now&timezone=browser&refresh=auto&kiosk&panelId=1'
         }
       },
-      // New Subsea route.
+      // Subsea route.
       {
         path: 'subsea',
         component: DashboardPageComponent,
         data: {
-          baseGrafanaUrl: 'http://localhost:3000/d/{rig}_SUB/subsea?orgId=1&from=now-6h&to=now&timezone=browser&refresh=auto'
+          baseGrafanaUrl: 'http://grafana/d/{rig}_SUB/subsea?orgId=1&from=now-6h&to=now&timezone=browser&refresh=auto&kiosk&panelId=1'
         }
       }
     ]

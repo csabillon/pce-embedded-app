@@ -15,7 +15,6 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   grafanaSafeUrl: SafeResourceUrl | null = null;
   
   // Native dashboard resolution.
-  // baseWidth will be set dynamically based on the window.innerWidth.
   baseWidth: number = 2560;
   baseHeight: number = 1340;
 
@@ -35,9 +34,9 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   private themeSubscription!: Subscription;
   private navigationSubscription!: Subscription;
 
-  // URL template using a placeholder {rig}
+  // Updated base URL using the reverse proxy (no explicit port)
   private baseGrafanaUrlTemplate: string =
-    'http://localhost:3000/d/{rig}_BOP/pce-bop-stack-uid?orgId=1&from=now-30m&to=now&timezone=browser&refresh=5s';
+    'http://grafana/d/{rig}_BOP/pce-bop-stack-uid?orgId=1&from=now-30m&to=now&timezone=browser&refresh=5s&kiosk&panelId=1';
 
   @Input() baseGrafanaUrl: string = this.baseGrafanaUrlTemplate;
 
@@ -49,7 +48,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // If a route provides a Grafana URL, override the template.
+    // Override URL if route data provides one.
     const routeUrl = this.activatedRoute.snapshot.data['baseGrafanaUrl'];
     if (routeUrl) {
       this.baseGrafanaUrlTemplate = routeUrl;
@@ -79,14 +78,13 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   }
 
   updateGrafanaUrl(theme: string): void {
-    const url = `${this.baseGrafanaUrl}&theme=${theme}&kiosk`;
+    const url = `${this.baseGrafanaUrl}&theme=${theme}`;
     this.grafanaSafeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
   updateGrafanaUrlWithRig(rig: string): void {
     // Replace the {rig} placeholder with the selected rig.
     this.baseGrafanaUrl = this.baseGrafanaUrlTemplate.replace('{rig}', rig);
-    // Update the URL with the current theme.
     this.themeService.theme$.subscribe(theme => {
       this.updateGrafanaUrl(theme);
     }).unsubscribe();
@@ -98,8 +96,6 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     this.availableWidth = window.innerWidth - marginWidth;
     this.availableHeight = window.innerHeight - marginHeight;
 
-    // Set baseWidth dynamically:
-    // If window.innerWidth is less than 2100, use 1920; otherwise, use 2560.
     if (window.innerWidth < 2100) {
       this.baseWidth = 1920;
     } else {

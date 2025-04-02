@@ -1,9 +1,14 @@
 <header class="header">
-  <div class="title">PCE Connect Dashboard</div>
-  <div class="theme-toggle" (click)="toggleTheme()">
-    <div class="toggle-switch" [ngClass]="{'dark': isDark}">
-      <div class="toggle-handle"></div>
+  <div class="header-left" (click)="goHome()">
+    <fa-icon [icon]="homeIcon" class="home-icon"></fa-icon>
+    <div class="title">PCE Connect Dashboard</div>
+  </div>
+  <div class="header-right">
+    <div class="theme-toggle" (click)="toggleTheme()">
+      <div class="toggle-switch" [ngClass]="{'dark': isDark}">
+        <div class="toggle-handle"></div>
+      </div>
+      <span class="toggle-label">{{ isDark ? 'Dark' : 'Light' }}</span>
     </div>
-    <span class="toggle-label">{{ isDark ? 'Dark' : 'Light' }}</span>
   </div>
 </header>

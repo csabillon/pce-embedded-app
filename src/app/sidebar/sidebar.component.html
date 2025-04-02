@@ -3,7 +3,7 @@
   <div class="rig-selection-top" (click)="toggleRigPopup()">
     <fa-icon icon="bars" class="rig-icon"></fa-icon>
     <span class="rig-name">
-      {{ currentRig === 'TODPS' ? 'TransoceanDPS' : 'TransoceanDTH' }}
+      {{ currentRig === 'TODPS' ? 'TransoceanDPS' : currentRig === 'TODTH' ? 'TransoceanDTH' : 'TransoceanDGD' }}
     </span>
     <div class="rig-popup" *ngIf="isRigPopupOpen">
       <ul>
@@ -18,7 +18,7 @@
   <nav class="menu">
     <ul>
       <li>
-        <a routerLink="/app">
+        <a routerLink="/app/bopstack">
           <fa-icon icon="oil-well"></fa-icon> BOP Stack
         </a>
       </li>
