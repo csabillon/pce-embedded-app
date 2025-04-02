@@ -1,5 +1,4 @@
 :host {
   display: block;
-  /* The map container height is set to 80% of the viewport height */
-  height: 80vh;
+  height: 100%;
 }
