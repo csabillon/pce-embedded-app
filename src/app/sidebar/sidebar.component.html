@@ -1,20 +1,25 @@
 <aside class="sidebar">
-  <!-- Rig selection displayed on top with minimal styling -->
+  <!-- Rig selection area -->
   <div class="rig-selection-top" (click)="toggleRigPopup()">
     <fa-icon icon="bars" class="rig-icon"></fa-icon>
     <span class="rig-name">
-      {{ currentRig === 'TODPS' ? 'TransoceanDPS' : currentRig === 'TODTH' ? 'TransoceanDTH' : 'TransoceanDGD' }}
+      {{ getCurrentRigName() }}
     </span>
+
     <div class="rig-popup" *ngIf="isRigPopupOpen">
       <ul>
-        <li (click)="selectRig('TODPS'); $event.stopPropagation()">TransoceanDPS</li>
-        <li (click)="selectRig('TODTH'); $event.stopPropagation()">TransoceanDTH</li>
-        <li (click)="selectRig('TODGD'); $event.stopPropagation()">TransoceanDGD</li>
+        <li
+          *ngFor="let rig of rigs"
+          (click)="onRigClick(rig.id, $event)"
+          [title]="rig.additionalInfo"
+        >
+          {{ rig.name }}
+        </li>
       </ul>
     </div>
   </div>
 
-  <!-- Other sidebar navigation items -->
+  <!-- Navigation links -->
   <nav class="menu">
     <ul>
       <li>
@@ -40,6 +45,7 @@
     </ul>
   </nav>
 
+  <!-- Logo -->
   <div class="logo-container">
     <img [src]="logoUrl" alt="Company Logo" class="logo" />
   </div>

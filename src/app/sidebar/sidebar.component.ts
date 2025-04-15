@@ -7,6 +7,7 @@ import { NavigationService } from '../navigation.service';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBars, faOilWell, faChartLine, faGauge, faWater } from '@fortawesome/free-solid-svg-icons';
+import { RigLocationService, Rig } from '../rig-location.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -17,10 +18,11 @@ import { faBars, faOilWell, faChartLine, faGauge, faWater } from '@fortawesome/f
 })
 export class SidebarComponent implements OnInit, OnDestroy {
   logoUrl: string = 'assets/logo.png';
-  currentRig: string = 'TODPS'; // default rig key
+  currentRig: string = 'TODPS';
   isRigPopupOpen: boolean = false;
-  private popupTimer: any = null;
+  rigs: Rig[] = [];
 
+  private popupTimer: any = null;
   private themeSubscription!: Subscription;
   private rigSubscription!: Subscription;
 
@@ -28,9 +30,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
     private themeService: ThemeService,
     private navigationService: NavigationService,
     private router: Router,
+    private rigService: RigLocationService,
     library: FaIconLibrary
   ) {
-    // Use faBars for the hamburger icon and others for menu items.
     library.addIcons(faBars, faOilWell, faChartLine, faGauge, faWater);
   }
 
@@ -38,18 +40,24 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.themeSubscription = this.themeService.theme$.subscribe(theme => {
       this.logoUrl = theme === 'dark' ? 'assets/logo_white.png' : 'assets/logo.png';
     });
+
     this.rigSubscription = this.navigationService.rig$.subscribe(rig => {
       this.currentRig = rig;
     });
+
+    this.rigService.getRigs().subscribe(data => {
+      this.rigs = data;
+    });
+  }
+
+  getCurrentRigName(): string {
+    const match = this.rigs.find(r => r.id === this.currentRig);
+    return match ? match.name : this.currentRig;
   }
 
   toggleRigPopup(): void {
     this.isRigPopupOpen = !this.isRigPopupOpen;
-    if (this.isRigPopupOpen) {
-      this.startPopupTimer();
-    } else {
-      this.clearPopupTimer();
-    }
+    this.isRigPopupOpen ? this.startPopupTimer() : this.clearPopupTimer();
   }
 
   private startPopupTimer(): void {
@@ -66,17 +74,19 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectRig(rig: string): void {
-    this.clearPopupTimer();
-    this.navigationService.selectRig(rig);
-    this.isRigPopupOpen = false; // Close popup after selection
+  onRigClick(rigId: string, event: Event): void {
+    event.stopPropagation();
+    this.selectRig(rigId);
+  }
 
-    // Check current route:
+  selectRig(rigId: string): void {
+    this.clearPopupTimer();
+    this.navigationService.selectRig(rigId);
+    this.isRigPopupOpen = false;
+
     if (this.router.url === '/app/startup') {
-      // If currently on the startup page, navigate to the BOP Stack page.
       this.router.navigate(['/app/bopstack']);
     }
-    // Otherwise, remain on the current page.
   }
 
   ngOnDestroy(): void {

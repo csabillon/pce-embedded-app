@@ -27,7 +27,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   effectiveWidth: number = 0;
   effectiveHeight: number = 0;
 
-  @Input() scrollThreshold: number = 0.8;
+  @Input() scrollThreshold: number = 0.9;
   scrollingEnabledX: boolean = false;
   scrollingEnabledY: boolean = false;
 
@@ -36,7 +36,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   // Updated base URL using the reverse proxy (no explicit port)
   private baseGrafanaUrlTemplate: string =
-    'http://grafana/d/{rig}_BOP/pce-bop-stack-uid?orgId=1&from=now-30m&to=now&timezone=browser&refresh=5s&kiosk&panelId=1';
+    'http://grafana/d/{rig}_BOP/pce-bop-stack-uid?orgId=1&from=now-6h&to=now&timezone=browser&refresh=5s&kiosk&panelId=1';
 
   @Input() baseGrafanaUrl: string = this.baseGrafanaUrlTemplate;
 
@@ -97,9 +97,9 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     this.availableHeight = window.innerHeight - marginHeight;
 
     if (window.innerWidth < 2100) {
-      this.baseWidth = 1920;
+      this.baseWidth = 1900;
     } else {
-      this.baseWidth = 2560;
+      this.baseWidth = 2500;
     }
 
     const naturalScaleX = Math.min(this.availableWidth / this.baseWidth, 1);

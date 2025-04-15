@@ -20,21 +20,28 @@ export class RigLocationService {
       name: 'TransoceanDPS', 
       latitude: 25.5, 
       longitude: -90.5,
-      additionalInfo: 'Operated by Transocean. Deepwater drilling rig.'
+      additionalInfo: 'Operated by SLB. Deepwater drilling rig.'
     },
     { 
       id: 'TODTH', 
       name: 'TransoceanDTH', 
       latitude: 26.0, 
       longitude: -89.8,
-      additionalInfo: 'Operated by Transocean. Deepwater drilling rig.'
+      additionalInfo: 'Operated by SLB. Deepwater drilling rig.'
     },
     { 
-      id: 'TODGD', 
-      name: 'TransoceanDGD', 
+      id: 'TODPT', 
+      name: 'TransoceanDPT', 
+      latitude: 27.0, 
+      longitude: -87.8,
+      additionalInfo: 'Operated by SLB. Deepwater drilling rig.'
+    },
+    { 
+      id: 'GULFA', 
+      name: 'Gulfaks A', 
       latitude: 26.5, 
       longitude: -90.0,
-      additionalInfo: 'Operated by Transocean. Deepwater drilling rig.'
+      additionalInfo: 'Operated by Archer. Platform drilling rig.'
     }
   ];
 
