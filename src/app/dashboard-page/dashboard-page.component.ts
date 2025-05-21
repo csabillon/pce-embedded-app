@@ -36,7 +36,7 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   // Updated base URL using the reverse proxy (no explicit port)
   private baseGrafanaUrlTemplate: string =
-    'http://grafana/d/{rig}_BOP/pce-bop-stack-uid?orgId=1&from=now-6h&to=now&timezone=browser&refresh=5s&kiosk&panelId=1';
+    'http://grafana/d/{rig}_BOP/pce-bop-stack-uid?orgId=1&from=now-7d&to=now&timezone=browser&refresh=5s&kiosk&panelId=1';
 
   @Input() baseGrafanaUrl: string = this.baseGrafanaUrlTemplate;
 

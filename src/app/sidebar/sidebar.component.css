@@ -1,118 +1,85 @@
-:host {
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  font-weight: bold;
-  color: inherit;
-}
+/* base host */
+:host { font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; }
 
+/* sidebar container */
 .sidebar {
   display: flex;
   flex-direction: column;
   height: 100%;
   width: 160px;
-  padding: 10px;
+  padding: 8px;
   box-sizing: border-box;
-  background-color: #DCE1E1;
 }
 
-:host-context(.light) .sidebar {
-  background-color: #DCE1E1;
-  color: #051464;
-}
+/* light / dark backgrounds */
+:host-context(.light) .sidebar { background-color: #DCE1E1; color: #051464; }
+:host-context(.dark)  .sidebar { background-color: #2c2c2c; color: #eee; }
 
-:host-context(.dark) .sidebar {
-  background-color: #2c2c2c;
-  color: #eee;
-}
-
-/* Rig selection styling at the top */
+/* Rig-selection */
 .rig-selection-top {
   position: relative;
   display: flex;
   align-items: center;
   cursor: pointer;
-  padding: 6px 2px;
+  padding: 6px 4px;
   margin-bottom: 12px;
-  color: inherit;
 }
+.rig-icon { margin-right: 6px; }
 
-.rig-icon {
-  font-size: 16px;
-  margin-right: 6px;
-  color: inherit;
-}
-
-.rig-name {
-  flex-grow: 1;
-}
-
-/* Popup for rig selection with theme-sensitive background */
+/* popup list */
 .rig-popup {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  width: 100%;
+  position: absolute; top: 100%; left: 0;
+  width: 100%; background: #fff; border: 1px solid rgba(0,0,0,.1);
   z-index: 100;
 }
-
 :host-context(.dark) .rig-popup {
-  background-color: #444;
-  border-color: rgba(255,255,255,0.1);
-  color: #eee;
+  background: #444; border-color: rgba(255,255,255,.1);
 }
-
-.rig-popup ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
+.rig-popup ul { list-style: none; margin: 0; padding: 0; }
 .rig-popup li {
-  padding: 6px 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  padding: 6px 4px; cursor: pointer;
+  transition: background-color .2s;
 }
-
 .rig-popup li:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0,0,0,.1);
 }
-
 :host-context(.dark) .rig-popup li:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255,255,255,.1);
 }
 
-/* Sidebar menu styles */
+/* group headers */
+.group-header {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin: 0 0 8px 0; /* more space below each header */
+  user-select: none;
+}
+.group-header fa-icon { margin-right: 6px; }
+
+/* menu container: adds vertical space between groups */
+.menu {
+  margin-bottom: 24px;
+}
+
+/* menu lists (both Real Time & Analytics) */
 .menu ul {
   list-style: none;
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
+  margin: 0 0 16px 0; /* more space after the list */
   padding-left: 10px;
 }
-
 .menu ul li {
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
-
 .menu ul li a {
   display: flex;
   align-items: center;
   text-decoration: none;
-  padding: 4px 0;
   color: inherit;
-  transition: color 0.3s;
+  transition: color .2s;
 }
-
-.menu ul li a:hover {
-  color: #0055aa;
-}
-
-.menu ul li a fa-icon {
-  margin-right: 8px;
-  font-size: 14px;
-}
+.menu ul li a:hover { color: #0055aa; }
+.menu ul li a fa-icon { margin-right: 6px; }
 
 /* Logo container styles */
 .logo-container {
@@ -120,7 +87,6 @@
   text-align: center;
   padding-top: 20px;
 }
-
 .logo {
   width: 100px;
   height: auto;

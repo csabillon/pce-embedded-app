@@ -1,52 +1,79 @@
 <aside class="sidebar">
-  <!-- Rig selection area -->
+  <!-- Rig selector -->
   <div class="rig-selection-top" (click)="toggleRigPopup()">
     <fa-icon icon="bars" class="rig-icon"></fa-icon>
-    <span class="rig-name">
-      {{ getCurrentRigName() }}
-    </span>
-
+    <span class="rig-name">{{ getRigName(currentRig) }}</span>
     <div class="rig-popup" *ngIf="isRigPopupOpen">
       <ul>
-        <li
-          *ngFor="let rig of rigs"
-          (click)="onRigClick(rig.id, $event)"
-          [title]="rig.additionalInfo"
-        >
+        <li *ngFor="let rig of rigs"
+            (click)="onRigClick(rig.id, $event)"
+            [title]="rig.additionalInfo">
           {{ rig.name }}
         </li>
       </ul>
     </div>
   </div>
 
-  <!-- Navigation links -->
+  <!-- Real Time menu -->
   <nav class="menu">
-    <ul>
+    <h4 class="group-header" (click)="toggleGroup('realTime')">
+      <fa-icon [icon]="realTimeOpen ? 'chevron-down' : 'chevron-right'"></fa-icon>
+      Real Time
+    </h4>
+    <ul *ngIf="realTimeOpen">
       <li>
-        <a routerLink="/app/bopstack">
-          <fa-icon icon="oil-well"></fa-icon> BOP Stack
-        </a>
+        <a
+          routerLink="/app/bopstack"
+          [queryParams]="{ rig: currentRig, theme: currentTheme }"
+        ><fa-icon icon="oil-well"></fa-icon> BOP Stack</a>
       </li>
       <li>
-        <a routerLink="/app/analogs">
-          <fa-icon icon="chart-line"></fa-icon> Analogs
-        </a>
+        <a
+          routerLink="/app/analogs"
+          [queryParams]="{ rig: currentRig, theme: currentTheme }"
+        ><fa-icon icon="chart-line"></fa-icon> Analogs</a>
       </li>
       <li>
-        <a routerLink="/app/regulators">
-          <fa-icon icon="gauge"></fa-icon> Regulators
-        </a>
+        <a
+          routerLink="/app/regulators"
+          [queryParams]="{ rig: currentRig, theme: currentTheme }"
+        ><fa-icon icon="gauge"></fa-icon> Regulators</a>
       </li>
       <li>
-        <a routerLink="/app/subsea">
-          <fa-icon icon="water"></fa-icon> Subsea
-        </a>
+        <a
+          routerLink="/app/subsea"
+          [queryParams]="{ rig: currentRig, theme: currentTheme }"
+        ><fa-icon icon="water"></fa-icon> Subsea</a>
       </li>
     </ul>
   </nav>
 
-  <!-- Logo -->
+  <!-- Analytics menu -->
+  <nav class="menu">
+    <h4 class="group-header" (click)="toggleGroup('analytics')">
+      <fa-icon [icon]="analyticsOpen ? 'chevron-down' : 'chevron-right'"></fa-icon>
+      Analytics
+    </h4>
+    <ul *ngIf="analyticsOpen">
+      <li *ngFor="let link of analyticsLinks">
+        <a
+          [routerLink]="link.route"
+          [queryParams]="{ rig: currentRig, theme: currentTheme }"
+        ><fa-icon icon="chart-line"></fa-icon> {{ link.label }}</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- SLB Logo at bottom; switches based on currentTheme -->
   <div class="logo-container">
-    <img [src]="logoUrl" alt="Company Logo" class="logo" />
+    <img
+      [src]="
+        currentTheme === 'dark'
+          ? 'assets/logo_white.png'
+          : 'assets/logo.png'
+      "
+      alt="SLB Logo"
+      class="logo"
+    />
   </div>
 </aside>

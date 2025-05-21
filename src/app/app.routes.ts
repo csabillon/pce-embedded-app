@@ -4,48 +4,60 @@ import { LoginComponent } from './login/login.component';
 import { MainLayoutComponent } from './main-layout/main-layout.component';
 import { DashboardPageComponent } from './dashboard-page/dashboard-page.component';
 import { StartupPageComponent } from './startup-page/startup-page.component';
+import { StreamlitEmbedComponent } from './streamlit-embed/streamlit-embed.component';
 
 export const routes: Routes = [
-  // Public login route remains unchanged.
+  // Public
   { path: 'login', component: LoginComponent },
-  
-  // Protected area: MainLayoutComponent wraps all authenticated pages.
+
+  // Protected area
   {
     path: 'app',
     component: MainLayoutComponent,
     canActivate: [MsalGuard],
     children: [
-      // Startup page: Displayed as the home/startup view with the map.
       { path: 'startup', component: StartupPageComponent },
-      // Default child: BOP Stack dashboard.
       { path: 'bopstack', component: DashboardPageComponent, pathMatch: 'full' },
-      // Regulators route.
       {
         path: 'regulators',
         component: DashboardPageComponent,
         data: {
-          baseGrafanaUrl: 'http://grafana/d/{rig}_REG/regulators?orgId=1&from=now-6h&to=now&timezone=browser&refresh=auto&kiosk&panelId=1'
+          baseGrafanaUrl:
+            'http://grafana/d/{rig}_REG/regulators?orgId=1&from=now-7d&to=now&timezone=browser&refresh=auto&kiosk&panelId=1'
         }
       },
-      // Analogs route.
       {
         path: 'analogs',
         component: DashboardPageComponent,
         data: {
-          baseGrafanaUrl: 'http://grafana/d/{rig}_ANA/analogs?orgId=1&from=now-6h&to=now&timezone=browser&refresh=auto&kiosk&panelId=1'
+          baseGrafanaUrl:
+            'http://grafana/d/{rig}_ANA/analogs?orgId=1&from=now-7d&to=now&timezone=browser&refresh=auto&kiosk&panelId=1'
         }
       },
-      // Subsea route.
       {
         path: 'subsea',
         component: DashboardPageComponent,
         data: {
-          baseGrafanaUrl: 'http://grafana/d/{rig}_SUB/subsea?orgId=1&from=now-6h&to=now&timezone=browser&refresh=auto&kiosk&panelId=1'
+          baseGrafanaUrl:
+            'http://grafana/d/{rig}_SUB/subsea?orgId=1&from=now-7d&to=now&timezone=browser&refresh=auto&kiosk&panelId=1'
         }
-      }
+      },
+
+      // ← NEW: Streamlit Analytics
+      {
+        path: 'analytics/valve-analytics',
+        component: StreamlitEmbedComponent,
+        data: { page: 'Valve Analytics' }
+      },
+      {
+        path: 'analytics/pods-overview',
+        component: StreamlitEmbedComponent,
+        data: { page: 'Pods Overview' }
+      },
+      { path: 'analytics', redirectTo: 'analytics/valve-analytics', pathMatch: 'full' }
     ]
   },
-  
-  // Redirect any unknown paths to /login.
+
+  // catch-all
   { path: '**', redirectTo: 'login', pathMatch: 'full' }
 ];

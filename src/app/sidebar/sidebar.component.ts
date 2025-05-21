@@ -1,97 +1,116 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
-import { ThemeService } from '../theme.service';
-import { NavigationService } from '../navigation.service';
-import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faBars, faOilWell, faChartLine, faGauge, faWater } from '@fortawesome/free-solid-svg-icons';
+import { CommonModule }   from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
+import { Subscription }   from 'rxjs';
+import { FormsModule }    from '@angular/forms';
+import { ThemeService }   from '../theme.service';
+import { NavigationService }    from '../navigation.service';
 import { RigLocationService, Rig } from '../rig-location.service';
+
+import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {
+  faBars,
+  faOilWell,
+  faChartLine,
+  faGauge,
+  faWater,
+  faChevronDown,
+  faChevronRight
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, FontAwesomeModule, CommonModule],
+  imports: [CommonModule, FormsModule, RouterModule, FontAwesomeModule],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent implements OnInit, OnDestroy {
-  logoUrl: string = 'assets/logo.png';
-  currentRig: string = 'TODPS';
-  isRigPopupOpen: boolean = false;
-  rigs: Rig[] = [];
+  // holds the rig key
+  currentRig   = 'TODPS';
+  currentTheme = 'light';
 
+  // collapse state
+  realTimeOpen  = true;
+  analyticsOpen = true;
+
+  // rig-selector popup
+  isRigPopupOpen = false;
+  rigs: Rig[]    = [];
   private popupTimer: any = null;
-  private themeSubscription!: Subscription;
-  private rigSubscription!: Subscription;
+
+  // subscriptions
+  private themeSub!: Subscription;
+  private rigSub!: Subscription;
+
+  // analytics links
+  analyticsLinks = [
+    { label: 'Valve Analytics', route: ['/app/analytics/valve-analytics'] },
+    { label: 'Pods Overview',   route: ['/app/analytics/pods-overview'] }
+  ];
 
   constructor(
+    private router: Router,
     private themeService: ThemeService,
     private navigationService: NavigationService,
-    private router: Router,
     private rigService: RigLocationService,
     library: FaIconLibrary
   ) {
-    library.addIcons(faBars, faOilWell, faChartLine, faGauge, faWater);
+    library.addIcons(
+      faBars, faOilWell, faChartLine, faGauge, faWater,
+      faChevronDown, faChevronRight
+    );
   }
 
   ngOnInit(): void {
-    this.themeSubscription = this.themeService.theme$.subscribe(theme => {
-      this.logoUrl = theme === 'dark' ? 'assets/logo_white.png' : 'assets/logo.png';
-    });
+    // subscribe global theme
+    this.themeSub = this.themeService.theme$
+      .subscribe(t => this.currentTheme = t);
 
-    this.rigSubscription = this.navigationService.rig$.subscribe(rig => {
-      this.currentRig = rig;
-    });
+    // subscribe global rig key
+    this.rigSub = this.navigationService.rig$
+      .subscribe(r => this.currentRig = r);
 
-    this.rigService.getRigs().subscribe(data => {
-      this.rigs = data;
-    });
+    // load rigs for popup and name-lookup
+    this.rigService.getRigs().subscribe(data => this.rigs = data);
   }
 
-  getCurrentRigName(): string {
-    const match = this.rigs.find(r => r.id === this.currentRig);
-    return match ? match.name : this.currentRig;
+  // toggle expand/collapse
+  toggleGroup(group: 'realTime' | 'analytics') {
+    if (group === 'realTime')  this.realTimeOpen  = !this.realTimeOpen;
+    else                        this.analyticsOpen = !this.analyticsOpen;
   }
 
-  toggleRigPopup(): void {
+  // rig selection popup
+  toggleRigPopup() {
     this.isRigPopupOpen = !this.isRigPopupOpen;
     this.isRigPopupOpen ? this.startPopupTimer() : this.clearPopupTimer();
   }
-
-  private startPopupTimer(): void {
+  private startPopupTimer() {
     this.clearPopupTimer();
-    this.popupTimer = setTimeout(() => {
-      this.isRigPopupOpen = false;
-    }, 10000); // 10 seconds
+    this.popupTimer = setTimeout(() => this.isRigPopupOpen = false, 10_000);
   }
-
-  private clearPopupTimer(): void {
-    if (this.popupTimer) {
-      clearTimeout(this.popupTimer);
-      this.popupTimer = null;
-    }
+  private clearPopupTimer() {
+    if (this.popupTimer) { clearTimeout(this.popupTimer); this.popupTimer = null; }
   }
-
-  onRigClick(rigId: string, event: Event): void {
-    event.stopPropagation();
-    this.selectRig(rigId);
-  }
-
-  selectRig(rigId: string): void {
-    this.clearPopupTimer();
+  onRigClick(rigId: string, e: Event) {
+    e.stopPropagation();
     this.navigationService.selectRig(rigId);
     this.isRigPopupOpen = false;
-
     if (this.router.url === '/app/startup') {
       this.router.navigate(['/app/bopstack']);
     }
   }
 
+  // map a rig key to its display name
+  getRigName(id: string): string {
+    const rig = this.rigs.find(r => r.id === id);
+    return rig?.name || id;
+  }
+
   ngOnDestroy(): void {
-    this.themeSubscription?.unsubscribe();
-    this.rigSubscription?.unsubscribe();
+    this.themeSub.unsubscribe();
+    this.rigSub.unsubscribe();
     this.clearPopupTimer();
   }
 }
