@@ -43,7 +43,7 @@ export const routes: Routes = [
         }
       },
 
-      // ← NEW: Streamlit Analytics
+      // Streamlit Analytics
       {
         path: 'analytics/valve-analytics',
         component: StreamlitEmbedComponent,
@@ -53,6 +53,11 @@ export const routes: Routes = [
         path: 'analytics/pods-overview',
         component: StreamlitEmbedComponent,
         data: { page: 'Pods Overview' }
+      },
+      {
+        path: 'analytics/eds-cycles',
+        component: StreamlitEmbedComponent,
+        data: { page: 'EDS Cycles' }
       },
       { path: 'analytics', redirectTo: 'analytics/valve-analytics', pathMatch: 'full' }
     ]

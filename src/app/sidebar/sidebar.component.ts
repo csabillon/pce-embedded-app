@@ -45,8 +45,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   // analytics links
   analyticsLinks = [
-    { label: 'Valve Analytics', route: ['/app/analytics/valve-analytics'] },
-    { label: 'Pods Overview',   route: ['/app/analytics/pods-overview'] }
+    { label: 'Valve Cycles', route: ['/app/analytics/valve-analytics'] },
+    { label: 'Pod Health',   route: ['/app/analytics/pods-overview'] },
+    { label: 'EDS Events',   route: ['/app/analytics/eds-cycles'] }
   ];
 
   constructor(
