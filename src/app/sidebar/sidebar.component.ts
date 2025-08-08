@@ -15,7 +15,8 @@ import {
   faGauge,
   faWater,
   faChevronDown,
-  faChevronRight
+  faChevronRight,
+  faIndustry
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -26,28 +27,24 @@ import {
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent implements OnInit, OnDestroy {
-  // holds the rig key
   currentRig   = 'TODPS';
   currentTheme = 'light';
 
-  // collapse state
   realTimeOpen  = true;
   analyticsOpen = true;
 
-  // rig-selector popup
   isRigPopupOpen = false;
   rigs: Rig[]    = [];
   private popupTimer: any = null;
 
-  // subscriptions
   private themeSub!: Subscription;
   private rigSub!: Subscription;
 
-  // analytics links
   analyticsLinks = [
     { label: 'Valve Cycles', route: ['/app/analytics/valve-analytics'] },
     { label: 'Pod Health',   route: ['/app/analytics/pods-overview'] },
-    { label: 'EDS Events',   route: ['/app/analytics/eds-cycles'] }
+    { label: 'EDS Events',   route: ['/app/analytics/eds-cycles'] },
+    { label: 'Pressure Cycles',   route: ['/app/analytics/pressure-cycles'] }
   ];
 
   constructor(
@@ -59,30 +56,25 @@ export class SidebarComponent implements OnInit, OnDestroy {
   ) {
     library.addIcons(
       faBars, faOilWell, faChartLine, faGauge, faWater,
-      faChevronDown, faChevronRight
+      faChevronDown, faChevronRight, faIndustry // <--- Register new icon here
     );
   }
 
   ngOnInit(): void {
-    // subscribe global theme
     this.themeSub = this.themeService.theme$
       .subscribe(t => this.currentTheme = t);
 
-    // subscribe global rig key
     this.rigSub = this.navigationService.rig$
       .subscribe(r => this.currentRig = r);
 
-    // load rigs for popup and name-lookup
     this.rigService.getRigs().subscribe(data => this.rigs = data);
   }
 
-  // toggle expand/collapse
   toggleGroup(group: 'realTime' | 'analytics') {
     if (group === 'realTime')  this.realTimeOpen  = !this.realTimeOpen;
     else                        this.analyticsOpen = !this.analyticsOpen;
   }
 
-  // rig selection popup
   toggleRigPopup() {
     this.isRigPopupOpen = !this.isRigPopupOpen;
     this.isRigPopupOpen ? this.startPopupTimer() : this.clearPopupTimer();
@@ -103,7 +95,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
   }
 
-  // map a rig key to its display name
   getRigName(id: string): string {
     const rig = this.rigs.find(r => r.id === id);
     return rig?.name || id;

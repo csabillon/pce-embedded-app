@@ -45,10 +45,17 @@
           [queryParams]="{ rig: currentRig, theme: currentTheme }"
         ><fa-icon icon="water"></fa-icon> Subsea</a>
       </li>
+      <!-- NEW: Surface link -->
+      <li>
+        <a
+          routerLink="/app/surface"
+          [queryParams]="{ rig: currentRig, theme: currentTheme }"
+        ><fa-icon icon="industry"></fa-icon> Surface</a>
+      </li>
     </ul>
   </nav>
 
-  <!-- Analytics menu -->
+  <!-- Analytics menu, logo, etc. (unchanged) -->
   <nav class="menu">
     <h4 class="group-header" (click)="toggleGroup('analytics')">
       <fa-icon [icon]="analyticsOpen ? 'chevron-down' : 'chevron-right'"></fa-icon>
@@ -64,7 +71,6 @@
     </ul>
   </nav>
 
-  <!-- SLB Logo at bottom; switches based on currentTheme -->
   <div class="logo-container">
     <img
       [src]="

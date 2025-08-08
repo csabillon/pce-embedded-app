@@ -42,6 +42,14 @@ export const routes: Routes = [
             'http://grafana/d/{rig}_SUB/subsea?orgId=1&from=now-7d&to=now&timezone=browser&refresh=auto&kiosk&panelId=1'
         }
       },
+      {
+        path: 'surface',
+        component: DashboardPageComponent,
+        data: {
+          baseGrafanaUrl:
+            'http://grafana/d/{rig}_SUR/subsea?orgId=1&from=now-7d&to=now&timezone=browser&refresh=auto&kiosk&panelId=1'
+        }
+      },
 
       // Streamlit Analytics
       {
@@ -58,6 +66,11 @@ export const routes: Routes = [
         path: 'analytics/eds-cycles',
         component: StreamlitEmbedComponent,
         data: { page: 'EDS Cycles' }
+      },
+      {
+        path: 'analytics/pressure-cycles',
+        component: StreamlitEmbedComponent,
+        data: { page: 'Pressure Cycles' }
       },
       { path: 'analytics', redirectTo: 'analytics/valve-analytics', pathMatch: 'full' }
     ]
