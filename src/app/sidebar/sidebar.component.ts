@@ -44,7 +44,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
     { label: 'Valve Cycles', route: ['/app/analytics/valve-analytics'] },
     { label: 'Pod Health',   route: ['/app/analytics/pods-overview'] },
     { label: 'EDS Events',   route: ['/app/analytics/eds-cycles'] },
-    { label: 'Pressure Cycles',   route: ['/app/analytics/pressure-cycles'] }
+    { label: 'Pressure Cycles',   route: ['/app/analytics/pressure-cycles'] },
+    { label: 'Analog Trends',   route: ['/app/analytics/analog-trends'] }
   ];
 
   constructor(
@@ -56,7 +57,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   ) {
     library.addIcons(
       faBars, faOilWell, faChartLine, faGauge, faWater,
-      faChevronDown, faChevronRight, faIndustry // <--- Register new icon here
+      faChevronDown, faChevronRight, faIndustry 
     );
   }
 

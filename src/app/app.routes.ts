@@ -72,7 +72,12 @@ export const routes: Routes = [
         component: StreamlitEmbedComponent,
         data: { page: 'Pressure Cycles' }
       },
-      { path: 'analytics', redirectTo: 'analytics/valve-analytics', pathMatch: 'full' }
+      {
+        path: 'analytics/analog-trends',
+        component: StreamlitEmbedComponent,
+        data: { page: 'Analog Trends' }
+      },
+      { path: 'analytics', redirectTo: 'analytics/vave-analytics', pathMatch: 'full' }
     ]
   },
 
