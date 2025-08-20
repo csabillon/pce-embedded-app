@@ -73,9 +73,9 @@ export const routes: Routes = [
         data: { page: 'Pressure Cycles' }
       },
       {
-        path: 'analytics/analog-trends',
+        path: 'analytics/trends',
         component: StreamlitEmbedComponent,
-        data: { page: 'Analog Trends' }
+        data: { page: 'Trends' }
       },
       { path: 'analytics', redirectTo: 'analytics/vave-analytics', pathMatch: 'full' }
     ]

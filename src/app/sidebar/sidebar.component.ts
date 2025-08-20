@@ -45,7 +45,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     { label: 'Pod Health',   route: ['/app/analytics/pods-overview'] },
     { label: 'EDS Events',   route: ['/app/analytics/eds-cycles'] },
     { label: 'Pressure Cycles',   route: ['/app/analytics/pressure-cycles'] },
-    { label: 'Analog Trends',   route: ['/app/analytics/analog-trends'] }
+    { label: 'Custom Trends',   route: ['/app/analytics/trends'] }
   ];
 
   constructor(
