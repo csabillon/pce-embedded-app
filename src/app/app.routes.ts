@@ -1,3 +1,4 @@
+// app.routes.ts
 import { Routes } from '@angular/router';
 import { MsalGuard } from '@azure/msal-angular';
 import { LoginComponent } from './login/login.component';
@@ -7,10 +8,8 @@ import { StartupPageComponent } from './startup-page/startup-page.component';
 import { StreamlitEmbedComponent } from './streamlit-embed/streamlit-embed.component';
 
 export const routes: Routes = [
-  // Public
   { path: 'login', component: LoginComponent },
 
-  // Protected area
   {
     path: 'app',
     component: MainLayoutComponent,
@@ -18,6 +17,7 @@ export const routes: Routes = [
     children: [
       { path: 'startup', component: StartupPageComponent },
       { path: 'bopstack', component: DashboardPageComponent, pathMatch: 'full' },
+
       {
         path: 'regulators',
         component: DashboardPageComponent,
@@ -51,36 +51,17 @@ export const routes: Routes = [
         }
       },
 
-      // Streamlit Analytics
-      {
-        path: 'analytics/valve-analytics',
-        component: StreamlitEmbedComponent,
-        data: { page: 'Valve Analytics' }
-      },
-      {
-        path: 'analytics/pods-overview',
-        component: StreamlitEmbedComponent,
-        data: { page: 'Pods Overview' }
-      },
-      {
-        path: 'analytics/eds-cycles',
-        component: StreamlitEmbedComponent,
-        data: { page: 'EDS Cycles' }
-      },
-      {
-        path: 'analytics/pressure-cycles',
-        component: StreamlitEmbedComponent,
-        data: { page: 'Pressure Cycles' }
-      },
-      {
-        path: 'analytics/trends',
-        component: StreamlitEmbedComponent,
-        data: { page: 'Trends' }
-      },
-      { path: 'analytics', redirectTo: 'analytics/vave-analytics', pathMatch: 'full' }
+      // Streamlit Analytics (page names must match Streamlit's available_pages)
+      { path: 'analytics/valve-analytics',   component: StreamlitEmbedComponent, data: { page: 'Valve Analytics' } },
+      { path: 'analytics/pods-overview',     component: StreamlitEmbedComponent, data: { page: 'Pods Overview' } },
+      { path: 'analytics/eds-cycles',        component: StreamlitEmbedComponent, data: { page: 'EDS Cycles' } },
+      { path: 'analytics/pressure-cycles',   component: StreamlitEmbedComponent, data: { page: 'Pressure Cycles' } },
+      { path: 'analytics/trends',            component: StreamlitEmbedComponent, data: { page: 'Trends' } },
+
+      // FIX: typo 'vave-analytics' -> 'valve-analytics'
+      { path: 'analytics', redirectTo: 'analytics/valve-analytics', pathMatch: 'full' }
     ]
   },
 
-  // catch-all
   { path: '**', redirectTo: 'login', pathMatch: 'full' }
 ];
