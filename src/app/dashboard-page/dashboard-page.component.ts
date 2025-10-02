@@ -1,8 +1,9 @@
+// dashboard-page.component.ts
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { ThemeService } from '../theme.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import { NavigationService } from '../navigation.service';
 
 @Component({
@@ -13,94 +14,170 @@ import { NavigationService } from '../navigation.service';
 })
 export class DashboardPageComponent implements OnInit, OnDestroy {
   grafanaSafeUrl: SafeResourceUrl | null = null;
-  
+
   // Native dashboard resolution.
-  baseWidth: number = 2560;
-  baseHeight: number = 1340;
+  baseWidth = 2560;
+  baseHeight = 1340;
 
-  availableWidth: number = 0;
-  availableHeight: number = 0;
+  availableWidth = 0;
+  availableHeight = 0;
 
-  scaleX: number = 1;
-  scaleY: number = 1;
+  scaleX = 1;
+  scaleY = 1;
 
-  effectiveWidth: number = 0;
-  effectiveHeight: number = 0;
+  effectiveWidth = 0;
+  effectiveHeight = 0;
 
-  @Input() scrollThreshold: number = 0.9;
-  scrollingEnabledX: boolean = false;
-  scrollingEnabledY: boolean = false;
+  @Input() scrollThreshold = 0.9;
+  scrollingEnabledX = false;
+  scrollingEnabledY = false;
 
-  private themeSubscription!: Subscription;
-  private navigationSubscription!: Subscription;
+  private themeSub?: Subscription;
+  private rigSub?: Subscription;
 
-  // Updated base URL using the reverse proxy (no explicit port)
-  private baseGrafanaUrlTemplate: string =
+  /** Toggle: false = keep Angular URL clean; true = show rig/theme (shareable). */
+  private SHOW_FULL_ADDRESS = false;
+
+  /** Your Grafana URL template (includes kiosk). {rig} will be replaced. */
+  private baseGrafanaUrlTemplate =
     'http://grafana/d/{rig}_BOP/pce-bop-stack-uid?orgId=1&from=now-7d&to=now&timezone=browser&refresh=5s&kiosk&panelId=1';
 
-  @Input() baseGrafanaUrl: string = this.baseGrafanaUrlTemplate;
+  /** You can override via @Input or route data. */
+  @Input() baseGrafanaUrl = this.baseGrafanaUrlTemplate;
+
+  // Current state
+  private currentRig = 'TODTH';
+  private currentTheme = 'light';
+
+  private onResize = () => this.calculateScaleFactors();
 
   constructor(
     private sanitizer: DomSanitizer,
     private themeService: ThemeService,
-    private activatedRoute: ActivatedRoute,
+    private route: ActivatedRoute,
+    private router: Router,
     private navigationService: NavigationService
   ) {}
 
   ngOnInit(): void {
-    // Override URL if route data provides one.
-    const routeUrl = this.activatedRoute.snapshot.data['baseGrafanaUrl'];
+    // Allow route data to override the template (optional)
+    const routeUrl = this.route.snapshot.data['baseGrafanaUrl'];
     if (routeUrl) {
       this.baseGrafanaUrlTemplate = routeUrl;
       this.baseGrafanaUrl = routeUrl;
     }
 
-    this.themeSubscription = this.themeService.theme$.subscribe(theme => {
-      this.updateGrafanaUrl(theme);
+    // Seed from query params (first load)
+    const qp = this.route.snapshot.queryParams ?? {};
+    if (typeof qp['rig'] === 'string' && qp['rig'])   this.currentRig = qp['rig'];
+    if (typeof qp['theme'] === 'string' && qp['theme']) this.currentTheme = qp['theme'];
+
+    this.rebuildGrafanaUrl();
+    this.applyAddressPolicy();
+
+    // React to rig changes
+    this.rigSub = this.navigationService.rig$.subscribe(rig => {
+      if (!rig || rig === this.currentRig) return;
+      this.currentRig = rig;
+      this.rebuildGrafanaUrl();
+      this.applyAddressPolicy();
     });
 
-    this.navigationSubscription = this.navigationService.rig$.subscribe(rig => {
-      this.updateGrafanaUrlWithRig(rig);
+    // React to theme changes
+    this.themeSub = this.themeService.theme$.subscribe(theme => {
+      if (!theme || theme === this.currentTheme) return;
+      this.currentTheme = theme;
+      this.rebuildGrafanaUrl();
+      this.applyAddressPolicy();
     });
 
+    // Sizing
     this.calculateScaleFactors();
-    window.addEventListener('resize', this.calculateScaleFactors.bind(this));
+    window.addEventListener('resize', this.onResize);
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('resize', this.calculateScaleFactors.bind(this));
-    if (this.themeSubscription) {
-      this.themeSubscription.unsubscribe();
+    window.removeEventListener('resize', this.onResize);
+    this.themeSub?.unsubscribe();
+    this.rigSub?.unsubscribe();
+  }
+
+  // -------- Build & sanitize the Grafana URL (preserves kiosk) --------
+  private rebuildGrafanaUrl(): void {
+    // Always start from the template so flags like `kiosk` don’t get lost over time
+    const template = this.baseGrafanaUrl || this.baseGrafanaUrlTemplate;
+    const withRig = template.replace('{rig}', encodeURIComponent(this.currentRig));
+
+    let finalUrl = withRig;
+    try {
+      const u = new URL(withRig);
+      // Force theme (overrides any existing theme param)
+      u.searchParams.set('theme', this.currentTheme);
+
+      // Ensure kiosk stays active. Grafana accepts kiosk=1 and kiosk (bare).
+      // We normalize to kiosk=1 so it never gets dropped by serialization.
+      if (!u.searchParams.has('kiosk')) {
+        u.searchParams.set('kiosk', '1');
+      } else {
+        const v = u.searchParams.get('kiosk');
+        if (v === '' || v === null) u.searchParams.set('kiosk', '1');
+      }
+
+      finalUrl = u.toString();
+    } catch {
+      // Fallback: append/replace theme and ensure kiosk=1 manually
+      const hasTheme = /([?&])theme=/.test(withRig);
+      const hasKiosk = /([?&])kiosk([=&]|$)/.test(withRig);
+
+      const joiner = withRig.includes('?') ? '&' : '?';
+      let url = withRig;
+
+      if (!hasTheme) url += `${joiner}theme=${encodeURIComponent(this.currentTheme)}`;
+      else           url = url.replace(/([?&])theme=[^&]*/,'$1theme=' + encodeURIComponent(this.currentTheme));
+
+      if (!hasKiosk) url += (url.includes('?') ? '&' : '?') + 'kiosk=1';
+      else           url = url.replace(/([?&])kiosk(?:=[^&]*)?/,'$1kiosk=1');
+
+      finalUrl = url;
     }
-    if (this.navigationSubscription) {
-      this.navigationSubscription.unsubscribe();
+
+    this.grafanaSafeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
+  }
+
+  // -------- Address bar policy (strip or show rig/theme) --------
+  private applyAddressPolicy(): void {
+    const qp = this.route.snapshot.queryParams as Params;
+
+    if (this.SHOW_FULL_ADDRESS) {
+      if (qp['rig'] !== this.currentRig || qp['theme'] !== this.currentTheme) {
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { rig: this.currentRig, theme: this.currentTheme },
+          queryParamsHandling: 'merge',
+          replaceUrl: true
+        });
+      }
+      return;
+    }
+
+    if (qp['rig'] || qp['theme']) {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { rig: null, theme: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true
+      });
     }
   }
 
-  updateGrafanaUrl(theme: string): void {
-    const url = `${this.baseGrafanaUrl}&theme=${theme}`;
-    this.grafanaSafeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-  }
-
-  updateGrafanaUrlWithRig(rig: string): void {
-    // Replace the {rig} placeholder with the selected rig.
-    this.baseGrafanaUrl = this.baseGrafanaUrlTemplate.replace('{rig}', rig);
-    this.themeService.theme$.subscribe(theme => {
-      this.updateGrafanaUrl(theme);
-    }).unsubscribe();
-  }
-
-  calculateScaleFactors(): void {
+  // -------- Sizing / scaling --------
+  private calculateScaleFactors(): void {
     const marginWidth = 160;
     const marginHeight = 60;
     this.availableWidth = window.innerWidth - marginWidth;
     this.availableHeight = window.innerHeight - marginHeight;
 
-    if (window.innerWidth < 2100) {
-      this.baseWidth = 1900;
-    } else {
-      this.baseWidth = 2500;
-    }
+    this.baseWidth = window.innerWidth < 2100 ? 1900 : 2500;
 
     const naturalScaleX = Math.min(this.availableWidth / this.baseWidth, 1);
     const naturalScaleY = Math.min(this.availableHeight / this.baseHeight, 1);
