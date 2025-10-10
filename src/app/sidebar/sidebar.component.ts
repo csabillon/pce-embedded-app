@@ -16,7 +16,8 @@ import {
   faWater,
   faChevronDown,
   faChevronRight,
-  faIndustry
+  faIndustry,
+  faCog
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -32,6 +33,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   realTimeOpen  = true;
   analyticsOpen = true;
+  adminOpen     = true; // new dropdown default state
 
   isRigPopupOpen = false;
   rigs: Rig[]    = [];
@@ -40,11 +42,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private themeSub!: Subscription;
   private rigSub!: Subscription;
 
+  // Removed "Settings" from Analytics; it now lives under Admin
   analyticsLinks = [
-    { label: 'Valve Cycles', route: ['/app/analytics/valve-analytics'] },
-    { label: 'Pod Health',   route: ['/app/analytics/pods-overview'] },
-    { label: 'EDS Events',   route: ['/app/analytics/eds-cycles'] },
-    { label: 'Pressure Cycles',   route: ['/app/analytics/pressure-cycles'] },
+    { label: 'Valve Cycles',    route: ['/app/analytics/valve-analytics'] },
+    { label: 'Pod Health',      route: ['/app/analytics/pods-overview'] },
+    { label: 'EDS Events',      route: ['/app/analytics/eds-cycles'] },
+    { label: 'Pressure Cycles', route: ['/app/analytics/pressure-cycles'] },
     { label: 'Custom Trends',   route: ['/app/analytics/trends'] }
   ];
 
@@ -57,7 +60,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   ) {
     library.addIcons(
       faBars, faOilWell, faChartLine, faGauge, faWater,
-      faChevronDown, faChevronRight, faIndustry 
+      faChevronDown, faChevronRight, faIndustry, faCog
     );
   }
 
@@ -71,9 +74,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.rigService.getRigs().subscribe(data => this.rigs = data);
   }
 
-  toggleGroup(group: 'realTime' | 'analytics') {
-    if (group === 'realTime')  this.realTimeOpen  = !this.realTimeOpen;
-    else                        this.analyticsOpen = !this.analyticsOpen;
+  toggleGroup(group: 'realTime' | 'analytics' | 'admin') {
+    if (group === 'realTime')      this.realTimeOpen  = !this.realTimeOpen;
+    else if (group === 'analytics') this.analyticsOpen = !this.analyticsOpen;
+    else                            this.adminOpen     = !this.adminOpen;
   }
 
   toggleRigPopup() {

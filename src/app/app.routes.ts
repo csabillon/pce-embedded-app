@@ -57,6 +57,7 @@ export const routes: Routes = [
       { path: 'analytics/eds-cycles',        component: StreamlitEmbedComponent, data: { page: 'EDS Cycles' } },
       { path: 'analytics/pressure-cycles',   component: StreamlitEmbedComponent, data: { page: 'Pressure Cycles' } },
       { path: 'analytics/trends',            component: StreamlitEmbedComponent, data: { page: 'Trends' } },
+      { path: 'analytics/settings',            component: StreamlitEmbedComponent, data: { page: 'Settings' } },
 
       // FIX: typo 'vave-analytics' -> 'valve-analytics'
       { path: 'analytics', redirectTo: 'analytics/valve-analytics', pathMatch: 'full' }

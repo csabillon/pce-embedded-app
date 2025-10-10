@@ -22,40 +22,34 @@
     </h4>
     <ul *ngIf="realTimeOpen">
       <li>
-        <a
-          routerLink="/app/bopstack"
-          [queryParams]="{ rig: currentRig, theme: currentTheme }"
-        ><fa-icon icon="oil-well"></fa-icon> BOP Stack</a>
+        <a routerLink="/app/bopstack" [queryParams]="{ rig: currentRig, theme: currentTheme }">
+          <fa-icon icon="oil-well"></fa-icon> BOP Stack
+        </a>
       </li>
       <li>
-        <a
-          routerLink="/app/analogs"
-          [queryParams]="{ rig: currentRig, theme: currentTheme }"
-        ><fa-icon icon="chart-line"></fa-icon> Analogs</a>
+        <a routerLink="/app/analogs" [queryParams]="{ rig: currentRig, theme: currentTheme }">
+          <fa-icon icon="chart-line"></fa-icon> Analogs
+        </a>
       </li>
       <li>
-        <a
-          routerLink="/app/regulators"
-          [queryParams]="{ rig: currentRig, theme: currentTheme }"
-        ><fa-icon icon="gauge"></fa-icon> Regulators</a>
+        <a routerLink="/app/regulators" [queryParams]="{ rig: currentRig, theme: currentTheme }">
+          <fa-icon icon="gauge"></fa-icon> Regulators
+        </a>
       </li>
       <li>
-        <a
-          routerLink="/app/subsea"
-          [queryParams]="{ rig: currentRig, theme: currentTheme }"
-        ><fa-icon icon="water"></fa-icon> Subsea</a>
+        <a routerLink="/app/subsea" [queryParams]="{ rig: currentRig, theme: currentTheme }">
+          <fa-icon icon="water"></fa-icon> Subsea
+        </a>
       </li>
-      <!-- NEW: Surface link -->
       <li>
-        <a
-          routerLink="/app/surface"
-          [queryParams]="{ rig: currentRig, theme: currentTheme }"
-        ><fa-icon icon="industry"></fa-icon> Surface</a>
+        <a routerLink="/app/surface" [queryParams]="{ rig: currentRig, theme: currentTheme }">
+          <fa-icon icon="industry"></fa-icon> Surface
+        </a>
       </li>
     </ul>
   </nav>
 
-  <!-- Analytics menu, logo, etc. (unchanged) -->
+  <!-- Analytics menu -->
   <nav class="menu">
     <h4 class="group-header" (click)="toggleGroup('analytics')">
       <fa-icon [icon]="analyticsOpen ? 'chevron-down' : 'chevron-right'"></fa-icon>
@@ -63,21 +57,31 @@
     </h4>
     <ul *ngIf="analyticsOpen">
       <li *ngFor="let link of analyticsLinks">
-        <a
-          [routerLink]="link.route"
-          [queryParams]="{ rig: currentRig, theme: currentTheme }"
-        ><fa-icon icon="chart-line"></fa-icon> {{ link.label }}</a>
+        <a [routerLink]="link.route" [queryParams]="{ rig: currentRig, theme: currentTheme }">
+          <fa-icon icon="chart-line"></fa-icon> {{ link.label }}
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Admin menu (no cog in header) -->
+  <nav class="menu">
+    <h4 class="group-header" (click)="toggleGroup('admin')">
+      <fa-icon [icon]="adminOpen ? 'chevron-down' : 'chevron-right'"></fa-icon>
+      Admin
+    </h4>
+    <ul *ngIf="adminOpen">
+      <li>
+        <a [routerLink]="['/app/analytics/settings']" [queryParams]="{ rig: currentRig, theme: currentTheme }">
+          <fa-icon icon="cog"></fa-icon> Settings
+        </a>
       </li>
     </ul>
   </nav>
 
   <div class="logo-container">
     <img
-      [src]="
-        currentTheme === 'dark'
-          ? 'assets/logo_white.png'
-          : 'assets/logo.png'
-      "
+      [src]="currentTheme === 'dark' ? 'assets/logo_white.png' : 'assets/logo.png'"
       alt="SLB Logo"
       class="logo"
     />
