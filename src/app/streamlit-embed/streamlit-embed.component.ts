@@ -36,7 +36,7 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
   private subs = new Subscription();
 
   // Toggle address bar contents. False = hide rig/theme/start/end/preset/uid.
-  private SHOW_FULL_ADDRESS = false;
+  private SHOW_FULL_ADDRESS = true;
 
   // Manually set this for testing. Set to null to disable uid entirely.
   // UID identifies a user namespace in the Streamlit Trends page (isolates session state & saved presets).
