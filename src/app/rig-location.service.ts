@@ -37,11 +37,18 @@ export class RigLocationService {
       additionalInfo: 'Operated by SLB. Deepwater drilling rig.'
     },
     { 
+      id: 'BPTHU', 
+      name: 'BP Thunderhorse', 
+      latitude: 27.5, 
+      longitude: -92.0,
+      additionalInfo: 'Operated by BP. Platform drilling rig.'
+    },
+    { 
       id: 'STDMX', 
-      name: 'ST Drillmax', 
+      name: 'DS Maximus', 
       latitude: 26.5, 
       longitude: -90.0,
-      additionalInfo: 'Operated by Archer. Platform drilling rig.'
+      additionalInfo: 'Operated by SLB. Platform drilling rig.'
     }
   ];
 
