@@ -12,8 +12,8 @@
 }
 
 /* light / dark backgrounds */
-:host-context(.light) .sidebar { background-color: #DCE1E1; color: #051464; }
-:host-context(.dark)  .sidebar { background-color: #2c2c2c; color: #eee; }
+:host-context(.light) .sidebar { background-color: #EEF1F6; color: #051464; }
+:host-context(.dark)  .sidebar { background-color: #262730; color: #eee; }
 
 /* Rig-selection */
 .rig-selection-top {
