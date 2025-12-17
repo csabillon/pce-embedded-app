@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule }   from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { Subscription }   from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { FormsModule }    from '@angular/forms';
 import { ThemeService }   from '../theme.service';
 import { NavigationService }    from '../navigation.service';
@@ -41,6 +42,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   private themeSub!: Subscription;
   private rigSub!: Subscription;
+  private routerSub!: Subscription;
+
+  currentRoute = '';
 
   // Removed "Settings" from Analytics; it now lives under Admin
   analyticsLinks = [
@@ -72,6 +76,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
       .subscribe(r => this.currentRig = r);
 
     this.rigService.getRigs().subscribe(data => this.rigs = data);
+
+    // Track current route
+    this.currentRoute = this.router.url;
+    this.routerSub = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      this.currentRoute = event.url;
+    });
   }
 
   toggleGroup(group: 'realTime' | 'analytics' | 'admin') {
@@ -105,9 +117,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
     return rig?.name || id;
   }
 
+  isActiveRoute(route: string): boolean {
+    return this.currentRoute.includes(route);
+  }
+
   ngOnDestroy(): void {
     this.themeSub.unsubscribe();
     this.rigSub.unsubscribe();
+    this.routerSub.unsubscribe();
     this.clearPopupTimer();
   }
 }

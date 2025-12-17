@@ -7,7 +7,7 @@
   flex-direction: column;
   height: 100%;
   width: 160px;
-  padding: 8px;
+  padding: 8px 4px;
   box-sizing: border-box;
 }
 
@@ -52,34 +52,47 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-  margin: 0 0 8px 0; /* more space below each header */
+  margin: 0 0 5px 0;
   user-select: none;
 }
 .group-header fa-icon { margin-right: 6px; }
 
 /* menu container: adds vertical space between groups */
 .menu {
-  margin-bottom: 24px;
+  margin-bottom: 17px;
 }
 
 /* menu lists (both Real Time, Analytics, Admin) */
 .menu ul {
   list-style: none;
-  margin: 0 0 16px 0; /* more space after the list */
-  padding-left: 10px;
+  margin: 0 0 10px 0;
+  padding-left: 6px;
 }
 .menu ul li {
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 .menu ul li a {
   display: flex;
   align-items: center;
   text-decoration: none;
   color: inherit;
-  transition: color .2s;
+  transition: all .2s;
+  padding: 4px 6px;
+  border-radius: 8px;
 }
 .menu ul li a:hover { color: #0055aa; }
 .menu ul li a fa-icon { margin-right: 6px; }
+
+/* Active link styling */
+.menu ul li a.active-link {
+  background-color: rgba(0, 85, 170, 0.15);
+}
+:host-context(.light) .menu ul li a.active-link {
+  background-color: rgba(5, 20, 100, 0.12);
+}
+:host-context(.dark) .menu ul li a.active-link {
+  background-color: rgba(255, 255, 255, 0.15);
+}
 
 /* Logo container styles */
 .logo-container {
