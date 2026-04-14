@@ -72,6 +72,13 @@ export class RigLocationService {
       additionalInfo: 'Operated by SLB. Deepwater drilling rig.'
     },
     { 
+      id: 'TOBRS', 
+      name: 'TransoceanBRS', 
+      latitude: 26.9, 
+      longitude: -88.5,
+      additionalInfo: 'Operated by SLB. Deepwater drilling rig.'
+    },
+    { 
       id: 'BPTHU', 
       name: 'BP Thunderhorse', 
       latitude: 27.5, 

@@ -42,7 +42,7 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
   // UID identifies a user namespace in the Streamlit Trends page (isolates session state & saved presets).
   // Allowed characters: letters (A–Z, a–z), digits (0–9), '.', '-', and '_'. Others are replaced with '_'.
   // Examples of valid values: 'user_01', 'chris_test', 'alice-light', 'dev.alpha', 'qa_user', 'demo-01', 'test_user_2', 'bob.dev'
-  private USER_ID: string | null = 'alice-test';
+  private USER_ID: string | null = 'chris-sabillon';
 
   private streamlitBase = 'http://localhost:8501/';
 
@@ -91,7 +91,7 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
 
     // restore preset/dates from storage (embed ignores incoming query params)
     const storedPreset = this.readStr(this.kPreset(this.s.rig));
-    if (this.s.page !== 'Trends') {
+    if (!this.isDatelessPage()) {
       this.restoreForRig(storedPreset);
     } else {
       if (storedPreset && storedPreset !== 'range') {
@@ -114,7 +114,7 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
         this.nav.rig$.subscribe(newRig => {
           if (!newRig || newRig === this.s.rig) return;
           this.s.rig = newRig;
-          if (this.s.page !== 'Trends') this.restoreForRig(this.readStr(this.kPreset(this.s.rig)));
+          if (!this.isDatelessPage()) this.restoreForRig(this.readStr(this.kPreset(this.s.rig)));
           else { this.s.start = ''; this.s.end = ''; }
           this.persist();
           this.setIframeSrc();
@@ -147,7 +147,7 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
 
   // ------------- Streamlit -> Angular (dates only) -------------
   private onMsg = (ev: MessageEvent<any>) => {
-    if (ev.data?.type !== 'BOP_DATE_CHANGE' || this.s.page === 'Trends') return;
+    if (ev.data?.type !== 'BOP_DATE_CHANGE' || this.isDatelessPage()) return;
     const start = String(ev.data.start || ''), end = String(ev.data.end || '');
     if (!start || !end) return;
 
@@ -179,7 +179,7 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
       usp.set('uid', this.s.uid.trim());       // <-- add uid to Streamlit URL
     }
 
-    if (this.s.page !== 'Trends') {
+    if (!this.isDatelessPage()) {
       const p = this.normalizePreset(this.s.preset);
       if (p && p !== 'range') {
         usp.set('preset', p);
@@ -219,7 +219,7 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
   private buildShareQueryParams(): ShareQuery {
     const q: ShareQuery = { rig: this.s.rig, theme: this.s.theme };
     if (this.s.uid && this.s.uid.trim()) q.uid = this.s.uid.trim(); // <-- include uid in share URL
-    if (this.s.page !== 'Trends') {
+    if (!this.isDatelessPage()) {
       const p = this.normalizePreset(this.s.preset);
       if (p && p !== 'range') q.preset = p;
       else if (this.s.start && this.s.end) { q.start = this.s.start; q.end = this.s.end; }
@@ -265,6 +265,14 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
   }
 
   // ---------------- misc ----------------
+
+  // Pages that ignore global start/end/preset (operation period comes from widget/session only).
+  // Reports uses @st.fragment — rig/theme changes must produce a new iframe.src (URL always includes
+  // rig+theme+uid, so any change naturally produces a different URL and triggers a reload).
+  private isDatelessPage(): boolean {
+    return this.s.page === 'Trends' || this.s.page === 'Reports';
+  }
+
   private normalizePreset(p?: any): string | null {
     if (!p) return null; const s = String(p).trim().toLowerCase(); return s || null;
   }

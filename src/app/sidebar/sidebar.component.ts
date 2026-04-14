@@ -18,7 +18,8 @@ import {
   faChevronDown,
   faChevronRight,
   faIndustry,
-  faCog
+  faCog,
+  faFileLines
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -64,7 +65,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   ) {
     library.addIcons(
       faBars, faOilWell, faChartLine, faGauge, faWater,
-      faChevronDown, faChevronRight, faIndustry, faCog
+      faChevronDown, faChevronRight, faIndustry, faCog, faFileLines
     );
   }
 

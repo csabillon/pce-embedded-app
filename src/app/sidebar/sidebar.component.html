@@ -72,6 +72,11 @@
     </h4>
     <ul *ngIf="adminOpen">
       <li>
+        <a [routerLink]="['/app/analytics/reports']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/analytics/reports')">
+          <fa-icon icon="file-lines"></fa-icon> Reports
+        </a>
+      </li>
+      <li>
         <a [routerLink]="['/app/analytics/settings']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/analytics/settings')">
           <fa-icon icon="cog"></fa-icon> Settings
         </a>
