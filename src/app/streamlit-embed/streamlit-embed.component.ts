@@ -13,6 +13,7 @@ type State = {
   page: string; rig: string; theme: string;
   preset: string | null; start: string; end: string;
   uid: string | null;
+  eventid: string | null;
 };
 
 type ShareQuery = {
@@ -22,6 +23,7 @@ type ShareQuery = {
   end?: string | null;
   preset?: string | null;
   uid?: string | null;
+  eventid?: string | null;
 };
 
 @Component({
@@ -40,9 +42,15 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
 
   // Manually set this for testing. Set to null to disable uid entirely.
   // UID identifies a user namespace in the Streamlit Trends page (isolates session state & saved presets).
-  // Allowed characters: letters (A–Z, a–z), digits (0–9), '.', '-', and '_'. Others are replaced with '_'.
+  // Allowed characters: letters (A-Z, a-z), digits (0-9), '.', '-', and '_'. Others are replaced with '_'.
   // Examples of valid values: 'user_01', 'chris_test', 'alice-light', 'dev.alpha', 'qa_user', 'demo-01', 'test_user_2', 'bob.dev'
   private USER_ID: string | null = 'chris-sabillon';
+
+  // Optional Trends Cognite preset event id. Set to null to disable.
+  // Applies only when the embedded Streamlit page is Trends; other pages do not receive eventid.
+  // The Angular route query param eventid is used when this manual override is null.
+  // Examples: 'EventExample001' or 'EventExample001.json'.
+  private EVENT_ID: string | null ='';
 
   private streamlitBase = 'http://localhost:8501/';
 
@@ -54,7 +62,8 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
     preset: 'last_30_days',
     start: '',
     end: '',
-    uid: null
+    uid: null,
+    eventid: null
   };
   private lastNonTrendsPreset: string | null = 'last_30_days';
   private lastIframeUrl = '';
@@ -88,6 +97,13 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
     this.s.uid = (this.USER_ID !== null && String(this.USER_ID).trim() !== '')
       ? String(this.USER_ID).trim()
       : (storedUid && storedUid.trim() ? storedUid.trim() : null);
+
+    // eventid: prefer explicit EVENT_ID, fallback to Angular route query param.
+    // It is only sent to Streamlit for the Trends page.
+    const queryEventId = this.route.snapshot.queryParamMap.get('eventid');
+    this.s.eventid = (this.EVENT_ID !== null && String(this.EVENT_ID).trim() !== '')
+      ? String(this.EVENT_ID).trim()
+      : (queryEventId && queryEventId.trim() ? queryEventId.trim() : null);
 
     // restore preset/dates from storage (embed ignores incoming query params)
     const storedPreset = this.readStr(this.kPreset(this.s.rig));
@@ -178,6 +194,9 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
     if (this.s.uid && this.s.uid.trim()) {
       usp.set('uid', this.s.uid.trim());       // <-- add uid to Streamlit URL
     }
+    if (this.isTrendsPage() && this.s.eventid && this.s.eventid.trim()) {
+      usp.set('eventid', this.s.eventid.trim());
+    }
 
     if (!this.isDatelessPage()) {
       const p = this.normalizePreset(this.s.preset);
@@ -219,6 +238,7 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
   private buildShareQueryParams(): ShareQuery {
     const q: ShareQuery = { rig: this.s.rig, theme: this.s.theme };
     if (this.s.uid && this.s.uid.trim()) q.uid = this.s.uid.trim(); // <-- include uid in share URL
+    if (this.isTrendsPage() && this.s.eventid && this.s.eventid.trim()) q.eventid = this.s.eventid.trim();
     if (!this.isDatelessPage()) {
       const p = this.normalizePreset(this.s.preset);
       if (p && p !== 'range') q.preset = p;
@@ -270,7 +290,11 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
   // Reports uses @st.fragment — rig/theme changes must produce a new iframe.src (URL always includes
   // rig+theme+uid, so any change naturally produces a different URL and triggers a reload).
   private isDatelessPage(): boolean {
-    return this.s.page === 'Trends' || this.s.page === 'Reports';
+    return this.isTrendsPage() || this.s.page === 'Reports';
+  }
+
+  private isTrendsPage(): boolean {
+    return this.s.page === 'Trends';
   }
 
   private normalizePreset(p?: any): string | null {
