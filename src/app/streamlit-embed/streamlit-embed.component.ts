@@ -44,7 +44,7 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
   // UID identifies a user namespace in the Streamlit Trends page (isolates session state & saved presets).
   // Allowed characters: letters (A-Z, a-z), digits (0-9), '.', '-', and '_'. Others are replaced with '_'.
   // Examples of valid values: 'user_01', 'chris_test', 'alice-light', 'dev.alpha', 'qa_user', 'demo-01', 'test_user_2', 'bob.dev'
-  private USER_ID: string | null = 'chris-sabillon';
+  private USER_ID: string | null = 'chris-sabillon1';
 
   // Optional Trends Cognite preset event id. Set to null to disable.
   // Applies only when the embedded Streamlit page is Trends; other pages do not receive eventid.
