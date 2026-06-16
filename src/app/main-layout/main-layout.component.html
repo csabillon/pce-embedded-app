@@ -1,7 +1,11 @@
 <div class="layout-container" [ngClass]="theme">
   <app-header></app-header>
-  <div class="body-wrapper">
-    <app-sidebar></app-sidebar>
+  <div class="body-wrapper" [class.sidebar-collapsed]="sidebarCollapsed" [style.--sidebar-width.px]="sidebarCollapsed ? sidebarCollapsedWidth : sidebarExpandedWidth">
+    <app-sidebar
+      [collapsed]="sidebarCollapsed"
+      [theme]="theme"
+      (collapsedChange)="onSidebarCollapsed($event)"
+    ></app-sidebar>
     <div class="content">
       <router-outlet></router-outlet>
     </div>

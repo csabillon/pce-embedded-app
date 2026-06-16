@@ -56,6 +56,7 @@ export const routes: Routes = [
       { path: 'analytics/pods-overview',     component: StreamlitEmbedComponent, data: { page: 'Pods Overview' } },
       { path: 'analytics/eds-cycles',        component: StreamlitEmbedComponent, data: { page: 'EDS Cycles' } },
       { path: 'analytics/pressure-cycles',   component: StreamlitEmbedComponent, data: { page: 'Pressure Cycles' } },
+      { path: 'analytics/modeling',          component: StreamlitEmbedComponent, data: { page: 'Modeling' } },
       { path: 'analytics/trends',            component: StreamlitEmbedComponent, data: { page: 'Trends' } },
       { path: 'analytics/settings',            component: StreamlitEmbedComponent, data: { page: 'Settings' } },
       { path: 'analytics/reports',             component: StreamlitEmbedComponent, data: { page: 'Reports' } },

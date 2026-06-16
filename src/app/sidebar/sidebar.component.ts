@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule }   from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { Subscription }   from 'rxjs';
@@ -15,11 +15,18 @@ import {
   faChartLine,
   faGauge,
   faWater,
+  faBoreHole,
+  faHeartbeat,
+  faBell,
+  faWaveSquare,
+  faChartArea,
+  faDiagramProject,
+  faSliders,
+  faFileInvoice,
   faChevronDown,
   faChevronRight,
-  faIndustry,
-  faCog,
-  faFileLines
+  faChevronLeft,
+  faIndustry
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -30,6 +37,10 @@ import {
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent implements OnInit, OnDestroy {
+  @Input() collapsed = false;
+  @Output() collapsedChange = new EventEmitter<boolean>();
+  @Input() theme: string = 'light';
+
   currentRig   = 'TODPS';
   currentTheme = 'light';
 
@@ -47,13 +58,19 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   currentRoute = '';
 
-  // Removed "Settings" from Analytics; it now lives under Admin
+  // "Modeling" and "Settings" now live under Admin
   analyticsLinks = [
-    { label: 'Valve Cycles',    route: ['/app/analytics/valve-analytics'] },
-    { label: 'Pod Health',      route: ['/app/analytics/pods-overview'] },
-    { label: 'EDS Events',      route: ['/app/analytics/eds-cycles'] },
-    { label: 'Pressure Cycles', route: ['/app/analytics/pressure-cycles'] },
-    { label: 'Custom Trends',   route: ['/app/analytics/trends'] }
+    { label: 'Valve Cycles',    route: ['/app/analytics/valve-analytics'], icon: 'bore-hole' },
+    { label: 'Pod Health',      route: ['/app/analytics/pods-overview'],   icon: 'heartbeat' },
+    { label: 'EDS Events',      route: ['/app/analytics/eds-cycles'],      icon: 'bell' },
+    { label: 'Pressure Cycles', route: ['/app/analytics/pressure-cycles'],  icon: 'wave-square' },
+    { label: 'Custom Trends',   route: ['/app/analytics/trends'],          icon: 'chart-area' }
+  ];
+
+  adminLinks = [
+    { label: 'Modeling',  route: ['/app/analytics/modeling'], icon: 'diagram-project' },
+    { label: 'Reports',   route: ['/app/analytics/reports'], icon: 'file-invoice' },
+    { label: 'Settings',  route: ['/app/analytics/settings'], icon: 'sliders' }
   ];
 
   constructor(
@@ -65,7 +82,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
   ) {
     library.addIcons(
       faBars, faOilWell, faChartLine, faGauge, faWater,
-      faChevronDown, faChevronRight, faIndustry, faCog, faFileLines
+      faBoreHole, faHeartbeat, faBell, faWaveSquare, faChartArea,
+      faDiagramProject, faSliders, faFileInvoice,
+      faChevronLeft,
+      faChevronDown, faChevronRight, faIndustry
     );
   }
 
@@ -91,6 +111,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (group === 'realTime')      this.realTimeOpen  = !this.realTimeOpen;
     else if (group === 'analytics') this.analyticsOpen = !this.analyticsOpen;
     else                            this.adminOpen     = !this.adminOpen;
+  }
+
+  toggleSidebar(): void {
+    this.collapsed = !this.collapsed;
+    this.collapsedChange.emit(this.collapsed);
   }
 
   toggleRigPopup() {

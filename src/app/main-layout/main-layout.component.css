@@ -5,6 +5,8 @@
   width: 100vw;
   margin: 0;
   padding: 0;
+  --sidebar-width-expanded: 184px;
+  --sidebar-width-collapsed: 56px;
 }
 
 /* The main container for the layout */
@@ -37,15 +39,20 @@
 
 /* Body-wrapper: holds sidebar and content */
 .body-wrapper {
+  --sidebar-width: var(--sidebar-width-expanded);
   flex: 1;
   display: flex;
   width: 100%;
   overflow: hidden;
 }
 
+.body-wrapper.sidebar-collapsed {
+  --sidebar-width: var(--sidebar-width-collapsed);
+}
+
 /* Sidebar: fixed width on the left */
 .sidebar {
-  flex: 0 0 160px;
+  flex: 0 0 var(--sidebar-width);
   padding: 10px;
   box-sizing: border-box;
   display: flex;
@@ -56,6 +63,7 @@
 /* Content area: fills the remaining space and has a transparent background */
 .content {
   flex: 1;
+  min-width: 0;
   box-sizing: border-box;
   overflow-y: auto;
   background-color: transparent;  /* Let the parent's (layout-container) background show */

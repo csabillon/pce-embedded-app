@@ -1,8 +1,12 @@
-<aside class="sidebar">
+<aside class="sidebar" [class.collapsed]="collapsed" [ngClass]="theme === 'dark' ? 'theme-dark' : 'theme-light'">
+  <button class="sidebar-collapse-btn" type="button" (click)="toggleSidebar()" [attr.aria-label]="collapsed ? 'Expand sidebar' : 'Collapse sidebar'">
+    <fa-icon [icon]="collapsed ? 'chevron-right' : 'chevron-left'"></fa-icon>
+  </button>
+
   <!-- Rig selector -->
   <div class="rig-selection-top" (click)="toggleRigPopup()">
     <fa-icon icon="bars" class="rig-icon"></fa-icon>
-    <span class="rig-name">{{ getRigName(currentRig) }}</span>
+    <span class="rig-name nav-label">{{ getRigName(currentRig) }}</span>
     <div class="rig-popup" *ngIf="isRigPopupOpen">
       <ul>
         <li *ngFor="let rig of rigs"
@@ -18,32 +22,32 @@
   <nav class="menu">
     <h4 class="group-header" (click)="toggleGroup('realTime')">
       <fa-icon [icon]="realTimeOpen ? 'chevron-down' : 'chevron-right'"></fa-icon>
-      Real Time
+      <span class="group-title nav-label">Real Time</span>
     </h4>
     <ul *ngIf="realTimeOpen">
       <li>
         <a [routerLink]="['/app/bopstack']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/bopstack')">
-          <fa-icon icon="oil-well"></fa-icon> BOP Stack
+          <fa-icon icon="oil-well"></fa-icon> <span class="nav-label">BOP Stack</span>
         </a>
       </li>
       <li>
         <a [routerLink]="['/app/analogs']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/analogs')">
-          <fa-icon icon="chart-line"></fa-icon> Analogs
+          <fa-icon icon="chart-line"></fa-icon> <span class="nav-label">Analogs</span>
         </a>
       </li>
       <li>
         <a [routerLink]="['/app/regulators']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/regulators')">
-          <fa-icon icon="gauge"></fa-icon> Regulators
+          <fa-icon icon="gauge"></fa-icon> <span class="nav-label">Regulators</span>
         </a>
       </li>
       <li>
         <a [routerLink]="['/app/subsea']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/subsea')">
-          <fa-icon icon="water"></fa-icon> Subsea
+          <fa-icon icon="water"></fa-icon> <span class="nav-label">Subsea</span>
         </a>
       </li>
       <li>
         <a [routerLink]="['/app/surface']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/surface')">
-          <fa-icon icon="industry"></fa-icon> Surface
+          <fa-icon icon="industry"></fa-icon> <span class="nav-label">Surface</span>
         </a>
       </li>
     </ul>
@@ -53,12 +57,12 @@
   <nav class="menu">
     <h4 class="group-header" (click)="toggleGroup('analytics')">
       <fa-icon [icon]="analyticsOpen ? 'chevron-down' : 'chevron-right'"></fa-icon>
-      Analytics
+      <span class="group-title nav-label">Analytics</span>
     </h4>
     <ul *ngIf="analyticsOpen">
       <li *ngFor="let link of analyticsLinks">
         <a [routerLink]="link.route" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute(link.route[0])">
-          <fa-icon icon="chart-line"></fa-icon> {{ link.label }}
+          <fa-icon [icon]="link.icon"></fa-icon> <span class="nav-label">{{ link.label }}</span>
         </a>
       </li>
     </ul>
@@ -68,17 +72,12 @@
   <nav class="menu">
     <h4 class="group-header" (click)="toggleGroup('admin')">
       <fa-icon [icon]="adminOpen ? 'chevron-down' : 'chevron-right'"></fa-icon>
-      Admin
+      <span class="group-title nav-label">Admin</span>
     </h4>
     <ul *ngIf="adminOpen">
-      <li>
-        <a [routerLink]="['/app/analytics/reports']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/analytics/reports')">
-          <fa-icon icon="file-lines"></fa-icon> Reports
-        </a>
-      </li>
-      <li>
-        <a [routerLink]="['/app/analytics/settings']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/analytics/settings')">
-          <fa-icon icon="cog"></fa-icon> Settings
+      <li *ngFor="let link of adminLinks">
+        <a [routerLink]="link.route" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute(link.route[0])">
+          <fa-icon [icon]="link.icon"></fa-icon> <span class="nav-label">{{ link.label }}</span>
         </a>
       </li>
     </ul>

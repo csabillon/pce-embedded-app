@@ -16,6 +16,9 @@ import { Subscription } from 'rxjs';
 })
 export class MainLayoutComponent implements OnInit, OnDestroy {
   theme: string = 'light';
+  sidebarCollapsed = false;
+  readonly sidebarExpandedWidth = 184;
+  readonly sidebarCollapsedWidth = 56;
   private themeSub!: Subscription;
 
   constructor(private themeService: ThemeService) {}
@@ -30,5 +33,10 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     if (this.themeSub) {
       this.themeSub.unsubscribe();
     }
+  }
+
+  onSidebarCollapsed(next: boolean): void {
+    this.sidebarCollapsed = next;
+    window.dispatchEvent(new Event('resize'));
   }
 }

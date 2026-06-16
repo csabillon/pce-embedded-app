@@ -1,5 +1,5 @@
 // dashboard-page.component.ts
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, ElementRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { ThemeService } from '../theme.service';
@@ -56,7 +56,8 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     private themeService: ThemeService,
     private route: ActivatedRoute,
     private router: Router,
-    private navigationService: NavigationService
+    private navigationService: NavigationService,
+    private elementRef: ElementRef
   ) {}
 
   ngOnInit(): void {
@@ -100,6 +101,12 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
     window.removeEventListener('resize', this.onResize);
     this.themeSub?.unsubscribe();
     this.rigSub?.unsubscribe();
+  }
+
+  private get contentBounds(): DOMRect | null {
+    const host: HTMLElement = this.elementRef.nativeElement;
+    const contentEl = host.closest('.content') as HTMLElement | null;
+    return contentEl?.getBoundingClientRect() ?? null;
   }
 
   // -------- Build & sanitize the Grafana URL (preserves kiosk) --------
@@ -172,10 +179,9 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   // -------- Sizing / scaling --------
   private calculateScaleFactors(): void {
-    const marginWidth = 160;
-    const marginHeight = 60;
-    this.availableWidth = window.innerWidth - marginWidth;
-    this.availableHeight = window.innerHeight - marginHeight;
+    const bounds = this.contentBounds;
+    this.availableWidth = Math.floor(bounds?.width ?? (window.innerWidth - 184));
+    this.availableHeight = Math.floor(bounds?.height ?? (window.innerHeight - 60));
 
     this.baseWidth = window.innerWidth < 2100 ? 1900 : 2500;
 
