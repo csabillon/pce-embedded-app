@@ -190,7 +190,6 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
     const usp = new URLSearchParams();
     usp.set('embed', 'true');
     usp.append('embed_options', 'hide_loading_screen');
-    usp.append('embed_options', 'disable_scrolling');
     usp.set('page',  this.s.page  || 'Valve Analytics');
     usp.set('rig',   this.s.rig   || 'TODTH');
     usp.set('theme', this.s.theme || 'light'); // always include — stable & immediate
