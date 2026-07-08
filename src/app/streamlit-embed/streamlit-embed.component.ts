@@ -188,9 +188,13 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
   // ---------------- iframe URL (always full) ----------------
   private setIframeSrc(): void {
     const usp = new URLSearchParams();
+    usp.set('embed', 'true');
+    usp.append('embed_options', 'hide_loading_screen');
+    usp.append('embed_options', 'disable_scrolling');
     usp.set('page',  this.s.page  || 'Valve Analytics');
     usp.set('rig',   this.s.rig   || 'TODTH');
     usp.set('theme', this.s.theme || 'light'); // always include — stable & immediate
+    usp.append('embed_options', (this.s.theme || 'light') === 'dark' ? 'dark_theme' : 'light_theme');
     if (this.s.uid && this.s.uid.trim()) {
       usp.set('uid', this.s.uid.trim());       // <-- add uid to Streamlit URL
     }
