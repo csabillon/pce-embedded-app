@@ -51,15 +51,10 @@ export const routes: Routes = [
         }
       },
 
-      // Streamlit Analytics (page names must match Streamlit's available_pages)
-      { path: 'analytics/valve-analytics',   component: StreamlitEmbedComponent, data: { page: 'Valve Analytics' } },
-      { path: 'analytics/pods-overview',     component: StreamlitEmbedComponent, data: { page: 'Pods Overview' } },
-      { path: 'analytics/eds-cycles',        component: StreamlitEmbedComponent, data: { page: 'EDS Cycles' } },
-      { path: 'analytics/pressure-cycles',   component: StreamlitEmbedComponent, data: { page: 'Pressure Cycles' } },
-      { path: 'analytics/modeling',          component: StreamlitEmbedComponent, data: { page: 'Modeling' } },
-      { path: 'analytics/trends',            component: StreamlitEmbedComponent, data: { page: 'Trends' } },
-      { path: 'analytics/settings',            component: StreamlitEmbedComponent, data: { page: 'Settings' } },
-      { path: 'analytics/reports',             component: StreamlitEmbedComponent, data: { page: 'Reports' } },
+      // One reusable route keeps the Streamlit embed component mounted while
+      // switching between analytics pages; the component maps the slug to the
+      // Streamlit page query parameter.
+      { path: 'analytics/:analyticsPage', component: StreamlitEmbedComponent },
 
       // FIX: typo 'vave-analytics' -> 'valve-analytics'
       { path: 'analytics', redirectTo: 'analytics/valve-analytics', pathMatch: 'full' }

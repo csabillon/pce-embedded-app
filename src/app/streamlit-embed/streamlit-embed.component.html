@@ -1,9 +1,12 @@
 <div class="iframe-container">
-    <iframe
-      #streamlitFrame
-      title="BOP analytics"
-      frameborder="0"
-      class="streamlit-iframe"
-      referrerpolicy="strict-origin-when-cross-origin"
-    ></iframe>
-  </div>
+  <iframe
+    *ngFor="let frame of frames; trackBy: trackFrame"
+    [src]="frame.safeSrc"
+    [title]="'BOP analytics - ' + frame.page"
+    [class.is-active]="frame.slug === activeSlug"
+    [attr.aria-hidden]="frame.slug === activeSlug ? null : 'true'"
+    frameborder="0"
+    class="streamlit-iframe"
+    referrerpolicy="strict-origin-when-cross-origin"
+  ></iframe>
+</div>

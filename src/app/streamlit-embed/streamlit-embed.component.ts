@@ -1,12 +1,17 @@
 // steamlit-embed.component.ts
-import {
-  Component, OnInit, OnDestroy, ViewChild, ElementRef, Optional
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, Optional } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { ActivatedRoute, Data, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { combineLatest, Subscription } from 'rxjs';
 import { NavigationService } from '../navigation.service';
 import { ThemeService } from '../theme.service';
+import {
+  DEFAULT_STREAMLIT_PAGE,
+  isDatelessStreamlitPage,
+  STREAMLIT_ANALYTICS_PAGES,
+  streamlitPageFromSlug,
+} from './streamlit-pages';
 
 type DatePair = { start: string; end: string };
 type State = {
@@ -26,6 +31,16 @@ type ShareQuery = {
   eventid?: string | null;
 };
 
+type StreamlitFrame = {
+  slug: string;
+  page: string;
+  src: string;
+  safeSrc: SafeResourceUrl;
+  lastUsed: number;
+};
+
+const MAX_CACHED_STREAMLIT_FRAMES = STREAMLIT_ANALYTICS_PAGES.length;
+
 @Component({
   selector: 'app-streamlit-embed',
   standalone: true,
@@ -34,7 +49,9 @@ type ShareQuery = {
   styleUrls: ['./streamlit-embed.component.css']
 })
 export class StreamlitEmbedComponent implements OnInit, OnDestroy {
-  @ViewChild('streamlitFrame', { static: true }) private iframe!: ElementRef<HTMLIFrameElement>;
+  frames: StreamlitFrame[] = [];
+  activeSlug = DEFAULT_STREAMLIT_PAGE.slug;
+
   private subs = new Subscription();
 
   // Toggle address bar contents. False = hide rig/theme/start/end/preset/uid.
@@ -66,8 +83,8 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
     eventid: null
   };
   private lastNonTrendsPreset: string | null = 'last_30_days';
-  private lastIframeUrl = '';
   private didCleanOnce = false;
+  private frameUseSeq = 0;
 
   // sessionStorage keys
   private kRig = 'bopRig';
@@ -80,15 +97,13 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,
+    private sanitizer: DomSanitizer,
     @Optional() private nav?: NavigationService,
     @Optional() private themeSvc?: ThemeService,
   ) {}
 
   // ---------------- lifecycle ----------------
   ngOnInit(): void {
-    // page from route.data, rig/theme from storage (embedded flow)
-    const data: Data = this.route.snapshot.data ?? {};
-    this.s.page  = (data['page'] as string) || this.s.page;
     this.s.rig   = this.readStr(this.kRig)   ?? this.s.rig;
     this.s.theme = this.readStr(this.kTheme) ?? this.s.theme;
 
@@ -98,31 +113,11 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
       ? String(this.USER_ID).trim()
       : (storedUid && storedUid.trim() ? storedUid.trim() : null);
 
-    // eventid: prefer explicit EVENT_ID, fallback to Angular route query param.
-    // It is only sent to Streamlit for the Trends page.
-    const queryEventId = this.route.snapshot.queryParamMap.get('eventid');
-    this.s.eventid = (this.EVENT_ID !== null && String(this.EVENT_ID).trim() !== '')
-      ? String(this.EVENT_ID).trim()
-      : (queryEventId && queryEventId.trim() ? queryEventId.trim() : null);
-
-    // restore preset/dates from storage (embed ignores incoming query params)
-    const storedPreset = this.readStr(this.kPreset(this.s.rig));
-    if (!this.isDatelessPage()) {
-      this.restoreForRig(storedPreset);
-    } else {
-      if (storedPreset && storedPreset !== 'range') {
-        this.s.preset = storedPreset; this.lastNonTrendsPreset = storedPreset;
-      }
-      this.s.start = ''; this.s.end = '';
-    }
-    this.persist();
-
-    // 1) set iframe once with full params (fast & stable)
-    this.setIframeSrc();
-
-    // 2) clean/hide Angular address bar (no navigation — just replaceState)
-    if (!this.SHOW_FULL_ADDRESS) this.clearQueryStringOnce();
-    else this.setAddressBarFull();
+    this.subs.add(
+      combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(() => {
+        this.activateCurrentRoute();
+      })
+    );
 
     // Optional external rig changes (Angular -> Streamlit)
     if (this.nav?.rig$) {
@@ -133,7 +128,8 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
           if (!this.isDatelessPage()) this.restoreForRig(this.readStr(this.kPreset(this.s.rig)));
           else { this.s.start = ''; this.s.end = ''; }
           this.persist();
-          this.setIframeSrc();
+          this.clearInactiveFrames();
+          this.syncActiveFrame();
           if (this.SHOW_FULL_ADDRESS) this.setAddressBarFull();
         })
       );
@@ -146,7 +142,8 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
           if (!th || th === this.s.theme) return;
           this.s.theme = th;
           this.persist();
-          this.setIframeSrc();
+          this.clearInactiveFrames();
+          this.syncActiveFrame();
           if (this.SHOW_FULL_ADDRESS) this.setAddressBarFull();
         })
       );
@@ -180,13 +177,42 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
     }
     this.writeStr(this.kPreset(this.s.rig), this.normalizePreset(this.s.preset));
 
-    // Rebuild iframe URL only if it actually changes
-    this.setIframeSrc();
+    this.syncActiveFrame();
     if (this.SHOW_FULL_ADDRESS) this.setAddressBarFull();
   };
 
-  // ---------------- iframe URL (always full) ----------------
-  private setIframeSrc(): void {
+  trackFrame(_index: number, frame: StreamlitFrame): string {
+    return frame.slug;
+  }
+
+  // ---------------- iframe URL/cache (always full) ----------------
+  private activateCurrentRoute(): void {
+    const page = streamlitPageFromSlug(this.route.snapshot.paramMap.get('analyticsPage'));
+    this.activeSlug = page.slug;
+    this.s.page = page.label;
+
+    const queryEventId = this.route.snapshot.queryParamMap.get('eventid');
+    this.s.eventid = (this.EVENT_ID !== null && String(this.EVENT_ID).trim() !== '')
+      ? String(this.EVENT_ID).trim()
+      : (queryEventId && queryEventId.trim() ? queryEventId.trim() : null);
+
+    const storedPreset = this.readStr(this.kPreset(this.s.rig));
+    if (!this.isDatelessPage()) {
+      this.restoreForRig(storedPreset);
+    } else {
+      if (storedPreset && storedPreset !== 'range') {
+        this.s.preset = storedPreset; this.lastNonTrendsPreset = storedPreset;
+      }
+      this.s.start = ''; this.s.end = '';
+    }
+    this.persist();
+    this.syncActiveFrame();
+
+    if (!this.SHOW_FULL_ADDRESS) this.clearQueryStringOnce();
+    else this.setAddressBarFull();
+  }
+
+  private buildStreamlitUrl(): string {
     const usp = new URLSearchParams();
     usp.set('embed', 'true');
     usp.append('embed_options', 'hide_loading_screen');
@@ -211,11 +237,45 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
       }
     }
 
-    const nextUrl = `${this.streamlitBase}?${usp.toString()}`;
-    if (nextUrl !== this.lastIframeUrl) {
-      this.iframe.nativeElement.src = nextUrl;
-      this.lastIframeUrl = nextUrl;
+    return `${this.streamlitBase}?${usp.toString()}`;
+  }
+
+  private syncActiveFrame(): void {
+    const nextUrl = this.buildStreamlitUrl();
+    const existing = this.frames.find(frame => frame.slug === this.activeSlug);
+    if (existing) {
+      existing.page = this.s.page;
+      existing.lastUsed = ++this.frameUseSeq;
+      if (existing.src !== nextUrl) {
+        existing.src = nextUrl;
+        existing.safeSrc = this.sanitizer.bypassSecurityTrustResourceUrl(nextUrl);
+      }
+    } else {
+      this.frames = [
+        ...this.frames,
+        {
+          slug: this.activeSlug,
+          page: this.s.page,
+          src: nextUrl,
+          safeSrc: this.sanitizer.bypassSecurityTrustResourceUrl(nextUrl),
+          lastUsed: ++this.frameUseSeq,
+        },
+      ];
     }
+    this.pruneCachedFrames();
+  }
+
+  private clearInactiveFrames(): void {
+    this.frames = this.frames.filter(frame => frame.slug === this.activeSlug);
+  }
+
+  private pruneCachedFrames(): void {
+    if (this.frames.length <= MAX_CACHED_STREAMLIT_FRAMES) return;
+    const inactive = this.frames
+      .filter(frame => frame.slug !== this.activeSlug)
+      .sort((a, b) => a.lastUsed - b.lastUsed);
+    const remove = new Set(inactive.slice(0, this.frames.length - MAX_CACHED_STREAMLIT_FRAMES).map(frame => frame.slug));
+    this.frames = this.frames.filter(frame => !remove.has(frame.slug));
   }
 
   // ---------------- address bar helpers (no router nav) ----------------
@@ -293,7 +353,7 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
   // Reports uses @st.fragment — rig/theme changes must produce a new iframe.src (URL always includes
   // rig+theme+uid, so any change naturally produces a different URL and triggers a reload).
   private isDatelessPage(): boolean {
-    return this.isTrendsPage() || this.s.page === 'Reports' || this.s.page === 'Modeling';
+    return isDatelessStreamlitPage(this.s.page);
   }
 
   private isTrendsPage(): boolean {
