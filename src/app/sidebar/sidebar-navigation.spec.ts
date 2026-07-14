@@ -7,6 +7,8 @@ describe('Analytics sidebar navigation', () => {
 
     expect(insightsIndex).toBeGreaterThanOrEqual(0);
     expect(ANALYTICS_LINKS[insightsIndex].route).toEqual(['/app/analytics/insights']);
+    expect(ANALYTICS_LINKS[insightsIndex].icon).toBe('lightbulb');
     expect(trendsIndex).toBe(insightsIndex + 1);
+    expect(ANALYTICS_LINKS[trendsIndex].label).toBe('Trends');
   });
 });

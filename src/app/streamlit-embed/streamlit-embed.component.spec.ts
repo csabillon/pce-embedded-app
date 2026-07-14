@@ -96,4 +96,30 @@ describe('StreamlitEmbedComponent', () => {
     expect(refreshedValveFrame).not.toBe(valveFrame);
     expect(refreshedValveFrame?.src).toBe(valveFrame.src);
   });
+
+  it('bounds inactive iframe sessions while retaining the active page', () => {
+    for (const slug of ['pods-overview', 'eds-cycles', 'pressure-cycles']) {
+      route.setAnalyticsPage(slug);
+      fixture.detectChanges();
+    }
+
+    expect(component.frames.length).toBe(3);
+    expect(component.frames.some(frame => frame.slug === 'pressure-cycles')).toBeTrue();
+    expect(component.frames.some(frame => frame.slug === 'valve-analytics')).toBeFalse();
+  });
+
+  it('ignores date messages that do not come from the active Streamlit iframe', () => {
+    const originalUrl = component.frames[0].src;
+    window.dispatchEvent(new MessageEvent('message', {
+      data: {
+        type: 'BOP_DATE_CHANGE',
+        start: '2026-01-01T00:00:00Z',
+        end: '2026-01-02T00:00:00Z',
+        presetId: 'range',
+      },
+      origin: 'https://untrusted.example',
+    }));
+
+    expect(component.frames[0].src).toBe(originalUrl);
+  });
 });

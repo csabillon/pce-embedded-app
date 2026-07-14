@@ -1,9 +1,20 @@
-// steamlit-embed.component.ts
-import { Component, OnInit, OnDestroy, Optional } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
+import {
+  Component,
+  ElementRef,
+  Inject,
+  OnDestroy,
+  OnInit,
+  Optional,
+  PLATFORM_ID,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
+import { CommonModule, isPlatformBrowser, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { MsalService } from '@azure/msal-angular';
 import { combineLatest, Subscription } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { NavigationService } from '../navigation.service';
 import { ThemeService } from '../theme.service';
 import {
@@ -27,7 +38,6 @@ type ShareQuery = {
   start?: string | null;
   end?: string | null;
   preset?: string | null;
-  uid?: string | null;
   eventid?: string | null;
 };
 
@@ -40,7 +50,7 @@ type StreamlitFrame = {
   lastUsedAt: number;
 };
 
-const MAX_CACHED_STREAMLIT_FRAMES = STREAMLIT_ANALYTICS_PAGES.length;
+const MAX_CACHED_STREAMLIT_FRAMES = 3;
 const STREAMLIT_FRAME_TTL_MS = 2 * 60 * 1000;
 
 @Component({
@@ -51,19 +61,15 @@ const STREAMLIT_FRAME_TTL_MS = 2 * 60 * 1000;
   styleUrls: ['./streamlit-embed.component.css']
 })
 export class StreamlitEmbedComponent implements OnInit, OnDestroy {
+  @ViewChildren('streamlitFrame') private iframeElements!: QueryList<ElementRef<HTMLIFrameElement>>;
+
   frames: StreamlitFrame[] = [];
   activeSlug = DEFAULT_STREAMLIT_PAGE.slug;
 
   private subs = new Subscription();
 
-  // Toggle address bar contents. False = hide rig/theme/start/end/preset/uid.
+  // Toggle address bar contents. User identity is never included in the share URL.
   private SHOW_FULL_ADDRESS = true;
-
-  // Manually set this for testing. Set to null to disable uid entirely.
-  // UID identifies a user namespace in the Streamlit Trends page (isolates session state & saved presets).
-  // Allowed characters: letters (A-Z, a-z), digits (0-9), '.', '-', and '_'. Others are replaced with '_'.
-  // Examples of valid values: 'user_01', 'chris_test', 'alice-light', 'dev.alpha', 'qa_user', 'demo-01', 'test_user_2', 'bob.dev'
-  private USER_ID: string | null = 'chris_test';
 
   // Optional Trends Cognite preset event id. Set to null to disable.
   // Applies only when the embedded Streamlit page is Trends; other pages do not receive eventid.
@@ -71,7 +77,8 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
   // Examples: 'EventExample001' or 'EventExample001.json'.
   private EVENT_ID: string | null ='';
 
-  private streamlitBase = 'http://localhost:8501/';
+  private readonly isBrowser: boolean;
+  private readonly streamlitBaseUrl = new URL(environment.streamlitBaseUrl);
 
   // Single source of truth
   private s: State = {
@@ -93,27 +100,25 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
   private kTheme = 'bopTheme';
   private kDate = (rig: string) => `bopDate:${rig}`;
   private kPreset = (rig: string) => `bopPreset:${rig}`;
-  private kUid = 'bopUid';
-
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,
     private sanitizer: DomSanitizer,
+    @Inject(PLATFORM_ID) platformId: object,
+    @Optional() private msal?: MsalService,
     @Optional() private nav?: NavigationService,
     @Optional() private themeSvc?: ThemeService,
-  ) {}
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
   // ---------------- lifecycle ----------------
   ngOnInit(): void {
     this.s.rig   = this.readStr(this.kRig)   ?? this.s.rig;
     this.s.theme = this.readStr(this.kTheme) ?? this.s.theme;
 
-    // uid: prefer explicit USER_ID (for testing), fallback to stored uid
-    const storedUid = this.readStr(this.kUid);
-    this.s.uid = (this.USER_ID !== null && String(this.USER_ID).trim() !== '')
-      ? String(this.USER_ID).trim()
-      : (storedUid && storedUid.trim() ? storedUid.trim() : null);
+    this.s.uid = this.resolveUserId();
 
     this.subs.add(
       combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(() => {
@@ -152,17 +157,17 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
     }
 
     // Streamlit -> Angular (dates only)
-    window.addEventListener('message', this.onMsg);
+    if (this.isBrowser) window.addEventListener('message', this.onMsg);
   }
 
   ngOnDestroy(): void {
     this.subs.unsubscribe();
-    window.removeEventListener('message', this.onMsg);
+    if (this.isBrowser) window.removeEventListener('message', this.onMsg);
   }
 
   // ------------- Streamlit -> Angular (dates only) -------------
   private onMsg = (ev: MessageEvent<any>) => {
-    if (ev.data?.type !== 'BOP_DATE_CHANGE' || this.isDatelessPage()) return;
+    if (!this.isTrustedStreamlitMessage(ev) || ev.data?.type !== 'BOP_DATE_CHANGE' || this.isDatelessPage()) return;
     const start = String(ev.data.start || ''), end = String(ev.data.end || '');
     if (!start || !end) return;
 
@@ -239,7 +244,9 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
       }
     }
 
-    return `${this.streamlitBase}?${usp.toString()}`;
+    const url = new URL(this.streamlitBaseUrl.href);
+    url.search = usp.toString();
+    return url.href;
   }
 
   private syncActiveFrame(): void {
@@ -314,7 +321,6 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
 
   private buildShareQueryParams(): ShareQuery {
     const q: ShareQuery = { rig: this.s.rig, theme: this.s.theme };
-    if (this.s.uid && this.s.uid.trim()) q.uid = this.s.uid.trim(); // <-- include uid in share URL
     if (this.isTrendsPage() && this.s.eventid && this.s.eventid.trim()) q.eventid = this.s.eventid.trim();
     if (!this.isDatelessPage()) {
       const p = this.normalizePreset(this.s.preset);
@@ -341,8 +347,6 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
     this.writeStr(this.kRig, this.s.rig);
     this.writeStr(this.kTheme, this.s.theme);
     this.writeStr(this.kPreset(this.s.rig), this.normalizePreset(this.s.preset));
-    // persist uid so it survives refreshes (manual override still comes from USER_ID)
-    this.writeStr(this.kUid, this.s.uid);
     if (this.s.preset === 'range' && this.s.start && this.s.end) {
       this.persistDates(this.s.rig, { start: this.s.start, end: this.s.end });
     }
@@ -362,6 +366,21 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
   }
 
   // ---------------- misc ----------------
+
+  private resolveUserId(): string | null {
+    const account = this.msal?.instance.getActiveAccount() ?? this.msal?.instance.getAllAccounts()[0];
+    const accountId = account?.localAccountId || account?.homeAccountId;
+    const normalized = String(accountId ?? '').trim().replace(/[^A-Za-z0-9._-]/g, '_');
+    return normalized || null;
+  }
+
+  private isTrustedStreamlitMessage(ev: MessageEvent): boolean {
+    if (!this.isBrowser || ev.origin !== this.streamlitBaseUrl.origin) return false;
+    const activeIframe = this.iframeElements?.find(
+      element => element.nativeElement.dataset['streamlitSlug'] === this.activeSlug,
+    );
+    return !!activeIframe?.nativeElement.contentWindow && ev.source === activeIframe.nativeElement.contentWindow;
+  }
 
   // Pages that ignore global start/end/preset (operation period comes from widget/session only).
   // Reports uses @st.fragment — rig/theme changes must produce a new iframe.src (URL always includes

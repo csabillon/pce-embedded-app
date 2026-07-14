@@ -20,6 +20,7 @@ import {
   faBell,
   faWaveSquare,
   faChartArea,
+  faLightbulb,
   faDiagramProject,
   faSliders,
   faFileInvoice,
@@ -40,8 +41,8 @@ export const ANALYTICS_LINKS: readonly SidebarLink[] = [
   { label: 'Pod Health',      route: ['/app/analytics/pods-overview'],   icon: 'heartbeat' },
   { label: 'EDS Events',      route: ['/app/analytics/eds-cycles'],      icon: 'bell' },
   { label: 'Pressure Cycles', route: ['/app/analytics/pressure-cycles'], icon: 'wave-square' },
-  { label: 'Insights',        route: ['/app/analytics/insights'],        icon: 'chart-area' },
-  { label: 'Custom Trends',   route: ['/app/analytics/trends'],          icon: 'chart-area' },
+  { label: 'Insights',        route: ['/app/analytics/insights'],        icon: 'lightbulb' },
+  { label: 'Trends',          route: ['/app/analytics/trends'],          icon: 'chart-area' },
 ] as const;
 
 @Component({
@@ -91,7 +92,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   ) {
     library.addIcons(
       faBars, faOilWell, faChartLine, faGauge, faWater,
-      faBoreHole, faHeartbeat, faBell, faWaveSquare, faChartArea,
+      faBoreHole, faHeartbeat, faBell, faWaveSquare, faChartArea, faLightbulb,
       faDiagramProject, faSliders, faFileInvoice,
       faChevronLeft,
       faChevronDown, faChevronRight, faIndustry

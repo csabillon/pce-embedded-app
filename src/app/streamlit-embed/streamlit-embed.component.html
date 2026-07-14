@@ -1,8 +1,10 @@
 <div class="iframe-container">
   <iframe
+    #streamlitFrame
     *ngFor="let frame of frames; trackBy: trackFrame"
     [src]="frame.safeSrc"
     [title]="'BOP analytics - ' + frame.page"
+    [attr.data-streamlit-slug]="frame.slug"
     [class.is-active]="frame.slug === activeSlug"
     [attr.aria-hidden]="frame.slug === activeSlug ? null : 'true'"
     frameborder="0"
