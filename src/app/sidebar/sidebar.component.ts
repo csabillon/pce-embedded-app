@@ -29,6 +29,21 @@ import {
   faIndustry
 } from '@fortawesome/free-solid-svg-icons';
 
+export type SidebarLink = {
+  label: string;
+  route: readonly string[];
+  icon: string;
+};
+
+export const ANALYTICS_LINKS: readonly SidebarLink[] = [
+  { label: 'Valve Cycles',    route: ['/app/analytics/valve-analytics'], icon: 'bore-hole' },
+  { label: 'Pod Health',      route: ['/app/analytics/pods-overview'],   icon: 'heartbeat' },
+  { label: 'EDS Events',      route: ['/app/analytics/eds-cycles'],      icon: 'bell' },
+  { label: 'Pressure Cycles', route: ['/app/analytics/pressure-cycles'], icon: 'wave-square' },
+  { label: 'Insights',        route: ['/app/analytics/insights'],        icon: 'chart-area' },
+  { label: 'Custom Trends',   route: ['/app/analytics/trends'],          icon: 'chart-area' },
+] as const;
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -59,13 +74,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   currentRoute = '';
 
   // "Modeling" and "Settings" now live under Admin
-  analyticsLinks = [
-    { label: 'Valve Cycles',    route: ['/app/analytics/valve-analytics'], icon: 'bore-hole' },
-    { label: 'Pod Health',      route: ['/app/analytics/pods-overview'],   icon: 'heartbeat' },
-    { label: 'EDS Events',      route: ['/app/analytics/eds-cycles'],      icon: 'bell' },
-    { label: 'Pressure Cycles', route: ['/app/analytics/pressure-cycles'],  icon: 'wave-square' },
-    { label: 'Custom Trends',   route: ['/app/analytics/trends'],          icon: 'chart-area' }
-  ];
+  readonly analyticsLinks = ANALYTICS_LINKS;
 
   adminLinks = [
     { label: 'Modeling',  route: ['/app/analytics/modeling'], icon: 'diagram-project' },

@@ -9,6 +9,7 @@ describe('Streamlit analytics page mapping', () => {
   it('maps known route slugs to Streamlit page labels', () => {
     expect(streamlitPageFromSlug('valve-analytics').label).toBe('Valve Analytics');
     expect(streamlitPageFromSlug('pods-overview').label).toBe('Pods Overview');
+    expect(streamlitPageFromSlug('insights').label).toBe('Insights');
     expect(streamlitPageFromSlug('trends').label).toBe('Trends');
   });
 
@@ -22,5 +23,6 @@ describe('Streamlit analytics page mapping', () => {
     expect(isDatelessStreamlitPage('Reports')).toBeTrue();
     expect(isDatelessStreamlitPage('Modeling')).toBeTrue();
     expect(isDatelessStreamlitPage('Valve Analytics')).toBeFalse();
+    expect(isDatelessStreamlitPage('Insights')).toBeFalse();
   });
 });

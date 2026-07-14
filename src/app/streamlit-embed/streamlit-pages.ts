@@ -10,6 +10,7 @@ export const STREAMLIT_ANALYTICS_PAGES: readonly StreamlitPage[] = [
   { slug: 'eds-cycles', label: 'EDS Cycles', dateless: false },
   { slug: 'pressure-cycles', label: 'Pressure Cycles', dateless: false },
   { slug: 'modeling', label: 'Modeling', dateless: true },
+  { slug: 'insights', label: 'Insights', dateless: false },
   { slug: 'trends', label: 'Trends', dateless: true },
   { slug: 'settings', label: 'Settings', dateless: true },
   { slug: 'reports', label: 'Reports', dateless: true },

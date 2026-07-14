@@ -37,9 +37,11 @@ type StreamlitFrame = {
   src: string;
   safeSrc: SafeResourceUrl;
   lastUsed: number;
+  lastUsedAt: number;
 };
 
 const MAX_CACHED_STREAMLIT_FRAMES = STREAMLIT_ANALYTICS_PAGES.length;
+const STREAMLIT_FRAME_TTL_MS = 2 * 60 * 1000;
 
 @Component({
   selector: 'app-streamlit-embed',
@@ -243,22 +245,28 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
   private syncActiveFrame(): void {
     const nextUrl = this.buildStreamlitUrl();
     const existing = this.frames.find(frame => frame.slug === this.activeSlug);
-    if (existing) {
+    const canReuseExisting = !!existing && !this.isFrameExpired(existing);
+    if (existing && canReuseExisting) {
       existing.page = this.s.page;
       existing.lastUsed = ++this.frameUseSeq;
+      existing.lastUsedAt = Date.now();
       if (existing.src !== nextUrl) {
         existing.src = nextUrl;
         existing.safeSrc = this.sanitizer.bypassSecurityTrustResourceUrl(nextUrl);
       }
     } else {
+      const retainedFrames = existing
+        ? this.frames.filter(frame => frame.slug !== this.activeSlug)
+        : this.frames;
       this.frames = [
-        ...this.frames,
+        ...retainedFrames,
         {
           slug: this.activeSlug,
           page: this.s.page,
           src: nextUrl,
           safeSrc: this.sanitizer.bypassSecurityTrustResourceUrl(nextUrl),
           lastUsed: ++this.frameUseSeq,
+          lastUsedAt: Date.now(),
         },
       ];
     }
@@ -270,12 +278,18 @@ export class StreamlitEmbedComponent implements OnInit, OnDestroy {
   }
 
   private pruneCachedFrames(): void {
+    const now = Date.now();
+    this.frames = this.frames.filter(frame => frame.slug === this.activeSlug || now - frame.lastUsedAt <= STREAMLIT_FRAME_TTL_MS);
     if (this.frames.length <= MAX_CACHED_STREAMLIT_FRAMES) return;
     const inactive = this.frames
       .filter(frame => frame.slug !== this.activeSlug)
       .sort((a, b) => a.lastUsed - b.lastUsed);
     const remove = new Set(inactive.slice(0, this.frames.length - MAX_CACHED_STREAMLIT_FRAMES).map(frame => frame.slug));
     this.frames = this.frames.filter(frame => !remove.has(frame.slug));
+  }
+
+  private isFrameExpired(frame: StreamlitFrame): boolean {
+    return Date.now() - frame.lastUsedAt > STREAMLIT_FRAME_TTL_MS;
   }
 
   // ---------------- address bar helpers (no router nav) ----------------

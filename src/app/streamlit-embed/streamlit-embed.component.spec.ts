@@ -80,4 +80,20 @@ describe('StreamlitEmbedComponent', () => {
     expect(component.frames.length).toBe(2);
     expect(component.frames.find(frame => frame.slug === 'valve-analytics')?.src).toBe(valveFrame.src);
   });
+
+  it('recreates expired cached Streamlit frames instead of reusing stale sessions', () => {
+    const valveFrame = component.frames[0];
+
+    route.setAnalyticsPage('pods-overview');
+    fixture.detectChanges();
+
+    valveFrame.lastUsedAt = Date.now() - (3 * 60 * 1000);
+    route.setAnalyticsPage('valve-analytics');
+    fixture.detectChanges();
+
+    const refreshedValveFrame = component.frames.find(frame => frame.slug === 'valve-analytics');
+    expect(refreshedValveFrame).toBeTruthy();
+    expect(refreshedValveFrame).not.toBe(valveFrame);
+    expect(refreshedValveFrame?.src).toBe(valveFrame.src);
+  });
 });
