@@ -4,9 +4,13 @@ Angular shell for the PCE dashboards and embedded Streamlit analytics pages.
 
 ## Development
 
-Install dependencies and start the local Angular development server:
+Angular 22 requires Node.js 22.22.3+, 24.15.0+, or 26+. This project pins
+Node.js 24.15.0 for nvm users. Install/select it, then install dependencies and
+start the local Angular development server:
 
 ```bash
+nvm install
+nvm use
 npm install
 npm start
 ```
@@ -21,6 +25,9 @@ Run the production build and headless unit tests:
 npm run build
 npm test -- --watch=false --browsers=ChromeHeadless
 ```
+
+Package scripts must be run with `npm run`, so use `npm run build` rather than
+`npm build`.
 
 ## Embedding behavior
 
