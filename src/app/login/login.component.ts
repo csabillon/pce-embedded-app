@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { MsalService } from '@azure/msal-angular';
 import { AuthenticationResult } from '@azure/msal-browser';
 
 @Component({
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   selector: 'app-login',
   templateUrl: './login.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {

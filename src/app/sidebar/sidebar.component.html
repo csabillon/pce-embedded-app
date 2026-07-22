@@ -7,15 +7,19 @@
   <div class="rig-selection-top" (click)="toggleRigPopup()">
     <fa-icon icon="bars" class="rig-icon"></fa-icon>
     <span class="rig-name nav-label">{{ getRigName(currentRig) }}</span>
-    <div class="rig-popup" *ngIf="isRigPopupOpen">
-      <ul>
-        <li *ngFor="let rig of rigs"
-            (click)="onRigClick(rig.id, $event)"
-            [title]="rig.additionalInfo">
-          {{ rig.name }}
-        </li>
-      </ul>
-    </div>
+    @if (isRigPopupOpen) {
+      <div class="rig-popup">
+        <ul>
+          @for (rig of rigs; track rig) {
+            <li
+              (click)="onRigClick(rig.id, $event)"
+              [title]="rig.additionalInfo">
+              {{ rig.name }}
+            </li>
+          }
+        </ul>
+      </div>
+    }
   </div>
 
   <!-- Real Time menu -->
@@ -24,33 +28,35 @@
       <fa-icon [icon]="realTimeOpen ? 'chevron-down' : 'chevron-right'"></fa-icon>
       <span class="group-title nav-label">Real Time</span>
     </h4>
-    <ul *ngIf="realTimeOpen">
-      <li>
-        <a [routerLink]="['/app/bopstack']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/bopstack')">
-          <fa-icon icon="oil-well"></fa-icon> <span class="nav-label">BOP Stack</span>
-        </a>
-      </li>
-      <li>
-        <a [routerLink]="['/app/analogs']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/analogs')">
-          <fa-icon icon="chart-line"></fa-icon> <span class="nav-label">Analogs</span>
-        </a>
-      </li>
-      <li>
-        <a [routerLink]="['/app/regulators']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/regulators')">
-          <fa-icon icon="gauge"></fa-icon> <span class="nav-label">Regulators</span>
-        </a>
-      </li>
-      <li>
-        <a [routerLink]="['/app/subsea']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/subsea')">
-          <fa-icon icon="water"></fa-icon> <span class="nav-label">Subsea</span>
-        </a>
-      </li>
-      <li>
-        <a [routerLink]="['/app/surface']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/surface')">
-          <fa-icon icon="industry"></fa-icon> <span class="nav-label">Surface</span>
-        </a>
-      </li>
-    </ul>
+    @if (realTimeOpen) {
+      <ul>
+        <li>
+          <a [routerLink]="['/app/bopstack']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/bopstack')">
+            <fa-icon icon="oil-well"></fa-icon> <span class="nav-label">BOP Stack</span>
+          </a>
+        </li>
+        <li>
+          <a [routerLink]="['/app/analogs']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/analogs')">
+            <fa-icon icon="chart-line"></fa-icon> <span class="nav-label">Analogs</span>
+          </a>
+        </li>
+        <li>
+          <a [routerLink]="['/app/regulators']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/regulators')">
+            <fa-icon icon="gauge"></fa-icon> <span class="nav-label">Regulators</span>
+          </a>
+        </li>
+        <li>
+          <a [routerLink]="['/app/subsea']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/subsea')">
+            <fa-icon icon="water"></fa-icon> <span class="nav-label">Subsea</span>
+          </a>
+        </li>
+        <li>
+          <a [routerLink]="['/app/surface']" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute('/app/surface')">
+            <fa-icon icon="industry"></fa-icon> <span class="nav-label">Surface</span>
+          </a>
+        </li>
+      </ul>
+    }
   </nav>
 
   <!-- Analytics menu -->
@@ -59,13 +65,17 @@
       <fa-icon [icon]="analyticsOpen ? 'chevron-down' : 'chevron-right'"></fa-icon>
       <span class="group-title nav-label">Analytics</span>
     </h4>
-    <ul *ngIf="analyticsOpen">
-      <li *ngFor="let link of analyticsLinks">
-        <a [routerLink]="link.route" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute(link.route[0])">
-          <fa-icon [icon]="link.icon"></fa-icon> <span class="nav-label">{{ link.label }}</span>
-        </a>
-      </li>
-    </ul>
+    @if (analyticsOpen) {
+      <ul>
+        @for (link of analyticsLinks; track link) {
+          <li>
+            <a [routerLink]="link.route" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute(link.route[0])">
+              <fa-icon [icon]="link.icon"></fa-icon> <span class="nav-label">{{ link.label }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    }
   </nav>
 
   <!-- Admin menu (no cog in header) -->
@@ -74,13 +84,17 @@
       <fa-icon [icon]="adminOpen ? 'chevron-down' : 'chevron-right'"></fa-icon>
       <span class="group-title nav-label">Admin</span>
     </h4>
-    <ul *ngIf="adminOpen">
-      <li *ngFor="let link of adminLinks">
-        <a [routerLink]="link.route" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute(link.route[0])">
-          <fa-icon [icon]="link.icon"></fa-icon> <span class="nav-label">{{ link.label }}</span>
-        </a>
-      </li>
-    </ul>
+    @if (adminOpen) {
+      <ul>
+        @for (link of adminLinks; track link) {
+          <li>
+            <a [routerLink]="link.route" [queryParams]="{ rig: currentRig, theme: currentTheme }" [class.active-link]="isActiveRoute(link.route[0])">
+              <fa-icon [icon]="link.icon"></fa-icon> <span class="nav-label">{{ link.label }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    }
   </nav>
 
   <div class="logo-container">
@@ -88,6 +102,6 @@
       [src]="currentTheme === 'dark' ? 'assets/logo_white.png' : 'assets/logo.png'"
       alt="SLB Logo"
       class="logo"
-    />
-  </div>
-</aside>
+      />
+    </div>
+  </aside>

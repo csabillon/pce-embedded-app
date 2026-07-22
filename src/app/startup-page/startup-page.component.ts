@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import * as L from 'leaflet';
 import { Subscription } from 'rxjs';
 import { NavigationService } from '../navigation.service';
@@ -10,6 +10,7 @@ import { ThemeService } from '../theme.service';
   selector: 'app-startup-page',
   templateUrl: './startup-page.component.html',
   styleUrls: ['./startup-page.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class StartupPageComponent implements OnInit, OnDestroy {

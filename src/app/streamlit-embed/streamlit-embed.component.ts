@@ -8,8 +8,9 @@ import {
   PLATFORM_ID,
   QueryList,
   ViewChildren,
+  ChangeDetectionStrategy
 } from '@angular/core';
-import { CommonModule, isPlatformBrowser, Location } from '@angular/common';
+import { isPlatformBrowser, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MsalService } from '@azure/msal-angular';
@@ -56,8 +57,9 @@ const STREAMLIT_FRAME_TTL_MS = 2 * 60 * 1000;
 @Component({
   selector: 'app-streamlit-embed',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './streamlit-embed.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./streamlit-embed.component.css']
 })
 export class StreamlitEmbedComponent implements OnInit, OnDestroy {

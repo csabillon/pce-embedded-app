@@ -1,9 +1,9 @@
 // src/main.ts
 
 import { bootstrapApplication } from '@angular/platform-browser';
-import { importProvidersFrom } from '@angular/core';
+import { importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS, withXhr } from '@angular/common/http';
 
 import {
   PublicClientApplication,
@@ -62,8 +62,8 @@ const msalInterceptorConfig: MsalInterceptorConfiguration = {
     // MSAL is now ready, so bootstrap your Angular app
     await bootstrapApplication(AppComponent, {
       providers: [
-        provideRouter(routes),
-        provideHttpClient(withInterceptorsFromDi()),
+        provideZoneChangeDetection(),provideRouter(routes),
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
 
         importProvidersFrom(
           MsalModule.forRoot(

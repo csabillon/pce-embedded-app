@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule }   from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { Subscription }   from 'rxjs';
@@ -50,6 +50,7 @@ export const ANALYTICS_LINKS: readonly SidebarLink[] = [
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, FontAwesomeModule],
   templateUrl: './sidebar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent implements OnInit, OnDestroy {

@@ -1,5 +1,5 @@
 // dashboard-page.component.ts
-import { Component, OnInit, OnDestroy, Input, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { ThemeService } from '../theme.service';
@@ -10,6 +10,7 @@ import { NavigationService } from '../navigation.service';
   selector: 'app-dashboard-page',
   standalone: true,
   templateUrl: './dashboard-page.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./dashboard-page.component.css']
 })
 export class DashboardPageComponent implements OnInit, OnDestroy {

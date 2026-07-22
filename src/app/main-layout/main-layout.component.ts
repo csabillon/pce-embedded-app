@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
@@ -12,6 +12,7 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [CommonModule, NgClass, HeaderComponent, SidebarComponent, FooterComponent, RouterOutlet],
   templateUrl: './main-layout.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./main-layout.component.css']
 })
 export class MainLayoutComponent implements OnInit, OnDestroy {
